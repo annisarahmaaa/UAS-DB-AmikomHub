@@ -55,13 +55,13 @@
 
         {{-- Blok Navigasi Filter Kategori Dinamis --}}
         <div class="mb-12 flex flex-wrap gap-4 justify-center">
-            <a href="/" 
+            <a href="/#events" 
                 class="px-6 py-2 {{ !request('category') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-gray-200 text-black hover:bg-gray-300' }} rounded-full font-bold transition">
                 Semua Kategori
             </a>
 
             @foreach($categories as $cat)
-                <a href="/?category={{ $cat->slug }}" 
+                <a href="/?category={{ $cat->slug }}#events" 
                     class="px-6 py-2 {{ request('category') == $cat->slug ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' }} rounded-full font-bold transition">
                     {{ $cat->name }}
                 </a>

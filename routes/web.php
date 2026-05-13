@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\EventController as EventAdminController;
+// Import PartnerController untuk Tugas Responsi
+use App\Http\Controllers\Admin\PartnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,5 +55,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Transactions
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+
+    // --- Rute Tambahan untuk Modul Partner (Responsi Tugas 3 & 4) ---
+    // Menampilkan daftar partner (Tugas 3)
+    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
+    
+    // Menampilkan form tambah partner (Tugas 4)
+    Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
+    
+    // Menyimpan data partner baru (Tugas 4)
+    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
 
 });

@@ -9,6 +9,9 @@ use App\Models\Event;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Seed the application's database.
+     */
     public function run(): void
     {
         // 1. Akun Admin Utama
@@ -36,7 +39,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 3. Insert 6 Sampel Events
-        // Event 1 (Kategori: Teknologi & Desain)
+        // Event 1
         Event::create([
             'category_id' => $catTech->id,
             'title'       => 'UI/UX Masterclass: Designing for the Future',
@@ -48,7 +51,7 @@ class DatabaseSeeder extends Seeder
             'poster_path' => 'posters/uiux.png',
         ]);
 
-        // Event 2 (Kategori: Teknologi & Desain)
+        // Event 2
         Event::create([
             'category_id' => $catTech->id,
             'title'       => 'Web3 & Blockchain Development Workshop',
@@ -60,11 +63,11 @@ class DatabaseSeeder extends Seeder
             'poster_path' => 'posters/web3.png',
         ]);
 
-        // Event 3 (Kategori: Olahraga & E-Sport)
+        // Event 3
         Event::create([
             'category_id' => $catSport->id,
             'title'       => 'E-Sport U-Champ: Mobile Legends',
-            'description' => 'Turnamen Mobile Legends antar mahasiswa terbesar tahun ini. Buktikan timmu yang terbaik!',
+            'description' => 'Turnamen Mobile Legends antar mahasiswa terbesar tahun ini.',
             'date'        => '2026-07-05 13:00:00',
             'location'    => 'Auditorium Kampus',
             'price'       => 100000,
@@ -72,7 +75,7 @@ class DatabaseSeeder extends Seeder
             'poster_path' => 'posters/mlbb.png',
         ]);
 
-        // Event 4 (Kategori: Olahraga & E-Sport)
+        // Event 4
         Event::create([
             'category_id' => $catSport->id,
             'title'       => 'Amikom Fun Run 5K 2026',
@@ -84,7 +87,7 @@ class DatabaseSeeder extends Seeder
             'poster_path' => 'posters/funrun.png',
         ]);
 
-        // Event 5 (Kategori: Seni & Hiburan)
+        // Event 5
         Event::create([
             'category_id' => $catArt->id,
             'title'       => 'Standup Comedy Campus Tour',
@@ -96,7 +99,7 @@ class DatabaseSeeder extends Seeder
             'poster_path' => 'posters/standup.png',
         ]);
 
-        // Event 6 (Kategori: Seni & Hiburan)
+        // Event 6
         Event::create([
             'category_id' => $catArt->id,
             'title'       => 'Indie Music Fest 2026',
@@ -106,6 +109,11 @@ class DatabaseSeeder extends Seeder
             'price'       => 60000,
             'stock'       => 300,
             'poster_path' => 'posters/musicfest.png',
+        ]);
+
+        // 4. Memanggil Seeder Partner (Tugas 2 - Soal Responsi)
+        $this->call([
+            PartnerSeeder::class,
         ]);
     }
 }
