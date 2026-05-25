@@ -4,33 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Category;
+use App\Models\Partner; // 1. Wajib tambahkan ini untuk memanggil model Partner
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     /**
-     * Menampilkan halaman utama dengan daftar event dan kategori.
+     * Menampilkan halaman utama dengan daftar event, kategori, dan partner.
      */
     public function index(Request $request)
     {
-        // 1. Ambil semua kategori untuk filter tab button
+        // Ambil semua kategori untuk filter tab button
         $categories = Category::all();
 
-        // 2. Buat kueri dasar untuk event (Eager loading, filter tanggal, dan urutan)
+        // Ambil semua data partner untuk ditampilkan di bagian bawah (Soal 4)
+        $partners = Partner::all(); // 2. Tambahkan kueri ini
+
+        // Buat kueri dasar untuk event (Eager loading, filter tanggal, dan urutan)
         $query = Event::with('category')
             ->where('date', '>=', now())
             ->orderBy('date', 'asc');
 
-        // 3. Filter berdasarkan slug kategori jika ada parameter ?category=...
+        // Filter berdasarkan slug kategori jika ada parameter ?category=...
         if ($request->filled('category')) {
             $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
 
-        // 4. Eksekusi query dan kirim ke view 'welcome'
+        // Eksekusi query
         $events = $query->get();
 
-        return view('welcome', compact('events', 'categories'));
+        // 3. Tambahkan 'partners' ke dalam compact agar terkirim ke view
+        return view('welcome', compact('events', 'categories', 'partners'));
     }
 }

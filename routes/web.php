@@ -11,7 +11,6 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\EventController as EventAdminController;
-// Import PartnerController untuk Tugas Responsi
 use App\Http\Controllers\Admin\PartnerController;
 
 /*
@@ -20,7 +19,7 @@ use App\Http\Controllers\Admin\PartnerController;
 |--------------------------------------------------------------------------
 */
 
-// Panggil HomeController agar variabel $events dan $categories dikirim ke view
+// Halaman Utama Publik (Mengirimkan variabel events, categories, dan partners)
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Halaman Statis & Informasi
@@ -50,20 +49,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Events (Resource: Mengelola CRUD secara otomatis)
     Route::resource('events', EventAdminController::class);
 
-    // Categories
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    // Categories (Diubah menjadi Resource untuk memenuhi kelengkapan CRUD Soal 1)
+    Route::resource('categories', CategoryController::class);
 
     // Transactions
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 
-    // --- Rute Tambahan untuk Modul Partner (Responsi Tugas 3 & 4) ---
-    // Menampilkan daftar partner (Tugas 3)
-    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
-    
-    // Menampilkan form tambah partner (Tugas 4)
-    Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
-    
-    // Menyimpan data partner baru (Tugas 4)
-    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
+    // Partners (Diubah menjadi Resource untuk memenuhi kelengkapan CRUD Soal 2)
+    Route::resource('partners', PartnerController::class);
 
 });

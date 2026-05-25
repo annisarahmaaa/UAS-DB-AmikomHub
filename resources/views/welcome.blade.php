@@ -117,4 +117,35 @@
             @endforelse
         </div>
     </section>
+
+    {{-- ================= BAGIAN PARTNER (SOAL 4 UTS) ================= --}}
+    <section class="py-16 bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8">
+            {{-- Judul Section --}}
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Official Partners</h2>
+                <p class="text-slate-400 text-sm font-medium mt-1">Mitra resmi yang mendukung kelancaran berbagai event di AmikomEventHub</p>
+            </div>
+
+            {{-- Proses Perulangan @forelse untuk Merender Daftar Partner --}}
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+                @forelse($partners as $partner)
+                    <div class="w-36 h-20 flex items-center justify-center p-3 bg-slate-50/50 rounded-2xl border border-slate-100 hover:shadow-md hover:border-indigo-100 transition-all duration-300 group">
+                        {{-- Menampilkan Gambar Logo dari URL Database --}}
+                        <img src="{{ $partner->logo_url }}" 
+                            alt="Logo {{ $partner->name }}" 
+                            title="{{ $partner->name }}" 
+                            class="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300">
+                    </div>
+                @empty
+                    {{-- Tampilan jika data partner di database masih kosong --}}
+                    <div class="text-center py-4">
+                        <p class="text-slate-400 text-sm italic">Belum ada partner yang terdaftar saat ini.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+    {{-- =============================================================== --}}
+
 @endsection
