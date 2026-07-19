@@ -37,18 +37,10 @@
                         {{ $events->firstItem() + $index }}
                     </td>
 
-                    {{-- Poster --}}
+                    {{-- Poster (Sesuai instruksi soal 9.4.5) --}}
                     <td class="px-8 py-6">
-                        <div class="w-14 h-20 bg-slate-100 rounded-xl overflow-hidden shadow-sm border border-slate-100">
-                            @if($event->poster_path)
-                                {{-- PERBAIKAN: Mengarah ke folder public/assets --}}
-                                <img src="{{ asset('assets/' . $event->poster_path) }}" 
-                                     class="w-full h-full object-cover"
-                                     onerror="this.src='https://placehold.co/400x600?text=No+File'">
-                            @else
-                                <img src="https://placehold.co/400x600?text=No+Image" class="w-full h-full object-cover grayscale opacity-50">
-                            @endif
-                        </div>
+                        <img src="{{ ($event->poster_path && \Storage::disk('public')->exists($event->poster_path)) ? asset('storage/' . $event->poster_path) : 'https://placehold.co/16x20' }}" 
+                            class="w-16 h-20 rounded-xl object-cover shadow-sm">
                     </td>
 
                     {{-- Informasi --}}
@@ -78,8 +70,8 @@
                         <div class="flex justify-center gap-2">
                             {{-- Edit --}}
                             <a href="{{ route('admin.events.edit', $event->id) }}" 
-                               class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                               title="Edit Event">
+                            class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                            title="Edit Event">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
@@ -87,9 +79,9 @@
 
                             {{-- Hapus --}}
                             <form action="{{ route('admin.events.destroy', $event->id) }}" 
-                                  method="POST" 
-                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus acara ini secara permanen?');"
-                                  class="inline">
+                                method="POST" 
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus acara ini secara permanen?');"
+                                class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 
@@ -105,7 +97,6 @@
                 </tr>
                 @empty
                 <tr>
-                    {{-- PERBAIKAN: Colspan disesuaikan dengan jumlah kolom (5) --}}
                     <td colspan="5" class="px-8 py-20 text-center">
                         <div class="flex flex-col items-center">
                             <div class="w-16 h-16 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mb-4 border border-dashed border-slate-200">

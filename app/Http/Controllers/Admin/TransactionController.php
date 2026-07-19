@@ -5,23 +5,30 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TransactionController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        // Fitur Pencarian Real-time
-        $query = Transaction::query();
+        // 1. Inisialisasi query dengan eager loading relasi 'event' untuk optimasi database
+        $query = Transaction::with('event');
 
-        if ($request->has('search')) {
-            $query->where('order_id', 'like', '%' . $request->search . '%')
-                  ->orWhere('customer_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('customer_email', 'like', '%' . $request->search . '%');
+        // 2. Fitur Pencarian dengan pencakupan query (Query Scoping) agar aman
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('order_id', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('customer_name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('customer_email', 'like', '%' . $searchTerm . '%');
+            });
         }
 
-        // Ambil data terbaru dengan paginasi 10 data
+        // 3. Ambil data terbaru dengan paginasi 10 data
         $transactions = $query->latest()->paginate(10);
 
-        return view('admin.transactions', compact('transactions'));
+        // 4. Pastikan path mengarah ke file index di dalam folder admin/transactions/
+        return view('admin.transactions.index', compact('transactions'));
     }
 }

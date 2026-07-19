@@ -73,10 +73,10 @@
             @forelse($events as $event)
             <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
                 <div class="relative overflow-hidden aspect-[3/4]">
-                    {{-- PERBAIKAN: Mengambil poster asli dari folder assets --}}
-                    <img src="{{ asset('assets/' . $event->poster_path) }}" alt="{{ $event->title }}"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        onerror="this.src='https://placehold.co/400x600?text=No+Poster'">
+                    {{-- Menggunakan pengondisian dinamis sesuai instruksi soal 9.4.5 --}}
+                    <img src="{{ ($event->poster_path && \Storage::disk('public')->exists($event->poster_path)) ? asset('storage/' . $event->poster_path) : 'https://placehold.co/200x600' }}" 
+                         alt="{{ $event->title }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     
                     <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold uppercase text-indigo-600">
                         {{-- Memanggil relasi nama kategori secara bersambung --}}
@@ -97,7 +97,8 @@
                         <span class="text-2xl font-black text-indigo-600">
                             {{ $event->price > 0 ? 'Rp ' . number_format($event->price, 0, ',', '.') : 'Gratis' }}
                         </span>
-                        <a href="{{ url('detail-event/' . $event->id) }}"
+                        {{-- PERBAIKAN (9.4.6 Langkah 3): Mengubah rute statis menjadi pemanggilan rute dinamis --}}
+                        <a href="{{ route('events.show', $event->id) }}"
                             class="px-5 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transition">
                             Lihat Detail
                         </a>
@@ -108,7 +109,7 @@
             <div class="col-span-full text-center py-20">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-4">
                     <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-3.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-1.414-1.414A1 1 0 009.586 13H4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2 2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-3.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-1.414-1.414A1 1 0 009.586 13H4" />
                     </svg>
                 </div>
                 <p class="text-slate-500 font-bold text-lg">Belum ada event tersedia.</p>

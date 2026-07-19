@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Category; // Tambahkan ini agar bisa memanggil Model Category langsung
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -19,13 +20,15 @@ class EventController extends Controller
     }
 
     /**
-     * Menampilkan detail satu event saat diklik oleh user
+     * Menampilkan detail satu event saat diklik oleh user (Sesuai instruksi soal 9.4.6)
      */
-    public function show($id)
+    public function show(Event $event)
     {
-        $event = Event::with('category')->findOrFail($id);
+        // Mengambil daftar kategori untuk keperluan menu footer / navigasi
+        $categories = Category::all();
         
-        return view('event-detail', compact('event'));
+        // Me-render view dengan membawa data kategori dan data spesifik acara tersebut
+        return view('event-detail', compact('categories', 'event'));
     }
 
     /**
