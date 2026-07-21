@@ -90,6 +90,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('login', [AuthController::class, 'showLogin'])->name('login');
         Route::post('login', [AuthController::class, 'login'])->name('login.post');
+        Route::post('register', [AuthController::class, 'register'])->name('register.post');
     });
 
     // [PROTECTED] Area Dalam Admin Panel (Sudah Login)
@@ -116,7 +117,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
             
             // Rute Kelola Pengguna Platform
-            Route::get('/users', [UserController::class, 'index'])->name('users.index');
+            Route::resource('users', UserController::class)->except(['show']);
             Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
             
         });

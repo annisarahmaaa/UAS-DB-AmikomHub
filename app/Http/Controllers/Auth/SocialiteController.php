@@ -10,8 +10,11 @@ use Laravel\Socialite\Facades\Socialite;
 class SocialiteController extends Controller
 {
     // Mengarahkan ke halaman login Google
-    public function redirectToGoogle()
+    public function redirectToGoogle(\Illuminate\Http\Request $request)
     {
+        if ($request->has('role')) {
+            session(['register_role' => $request->role]);
+        }
         return Socialite::driver('google')->redirect();
     }
 
@@ -25,14 +28,20 @@ class SocialiteController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                // Jika user belum ada, buat akun baru dengan role default 'user'
+                // Ambil role dari session jika ada, atau default ke 'user'
+                $role = session('register_role', 'user');
+
+                // Jika user belum ada, buat akun baru
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'password' => bcrypt('password_default_rahasia_google_sso_12345'),
-                    'role' => 'user', 
+                    'role' => $role, 
                 ]);
+                
+                // Hapus session role
+                session()->forget('register_role');
             } else {
                 // Jika akun sudah ada (misal sudah di-set jadi admin), cukup update google_id saja
                 // TANPA merubah role yang sudah ada!
