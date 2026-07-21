@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Event;       
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Event;        
 use App\Models\Transaction; 
 use Illuminate\View\View;
 
@@ -14,29 +16,52 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        // 1. Menjumlahkan semua nominal total_price dari transaksi yang sudah Lunas
-        $totalRevenue = Transaction::whereIn('status', ['settlement', 'success'])
+        $user = Auth::user();
+        $userRole = strtolower(trim($user->role ?? ''));
+
+        // Cek apakah user adalah Superadmin atau Admin utama
+        $isSuperAdmin = in_array($userRole, ['superadmin', 'admin']);
+
+        // 1. QUERY EVENT
+        $eventQuery = Event::query();
+        if (!$isSuperAdmin) {
+            // Jika Organizer biasa, batasi hanya event yang dibuat oleh organizer ini (menggunakan organizer_id)
+            $eventQuery->where('organizer_id', $user->id); 
+        }
+        $events = $eventQuery->get();
+        $eventIds = $events->pluck('id');
+
+        // 2. QUERY TRANSAKSI
+        $transactionQuery = Transaction::query();
+        if (!$isSuperAdmin) {
+            // Jika Organizer biasa, batasi hanya transaksi yang terikat dengan event milik organizer ini
+            $transactionQuery->whereIn('event_id', $eventIds);
+        }
+
+        // 3. Kalkulasi data matematis real-time (disesuaikan dengan filter role)
+        $totalRevenue = (clone $transactionQuery)
+            ->whereIn('status', ['settlement', 'success'])
             ->sum('total_price');
 
-        // 2. Menghitung berapa orang tamu yang tiketnya sudah Lunas
-        $ticketsSold = Transaction::whereIn('status', ['settlement', 'success'])
+        $ticketsSold = (clone $transactionQuery)
+            ->whereIn('status', ['settlement', 'success'])
             ->count();
 
-        // 3. Menghitung jumlah Acara Mendatang yang aktif diselenggarakan
-        $activeEvents = Event::where('date', '>=', now())
+        // Untuk event aktif, jika organizer ambil dari collection $events yang sudah difilter
+        $activeEvents = $isSuperAdmin 
+            ? Event::where('date', '>=', now())->count()
+            : $events->where('date', '>=', now())->count();
+
+        $pendingOrders = (clone $transactionQuery)
+            ->where('status', 'pending')
             ->count();
 
-        // 4. Menghitung Transaksi Ngadat (Status belum dibayar pelanggan / Pending)
-        $pendingOrders = Transaction::where('status', 'pending')
-            ->count();
-
-        // 5. Menyertakan 5 daftar riwayat pesanan (History) paling mutakhir di panel
-        $recentTransactions = Transaction::with('event')
+        $recentTransactions = (clone $transactionQuery)
+            ->with('event')
             ->latest()
             ->take(5)
             ->get();
 
-        // 6. Mengirimkan semua variabel ke komponen view dashboard admin
         return view('admin.dashboard', compact(
             'totalRevenue',
             'ticketsSold',
