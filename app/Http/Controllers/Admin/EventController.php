@@ -7,15 +7,28 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth; // <-- TAMBAHAN: Untuk mengecek user yang sedang login
 
 class EventController extends Controller
 {
     /**
-     * Menampilkan daftar event
+     * Menampilkan daftar event (MULTI-TENANT ISOLATION)
      */
     public function index()
     {
-        $events = Event::with('category')->latest()->paginate(10);
+        $user = Auth::user();
+
+        // Jika yang login adalah 'superadmin', tampilkan semua event di platform
+        if ($user->role === 'superadmin') {
+            $events = Event::with('category')->latest()->paginate(10);
+        } else {
+            // Jika yang login adalah 'organizer', HANYA tampilkan event milik dia sendiri!
+            $events = Event::with('category')
+                        ->where('organizer_id', $user->id)
+                        ->latest()
+                        ->paginate(10);
+        }
+
         return view('admin.events.index', compact('events'));
     }
 
@@ -29,11 +42,10 @@ class EventController extends Controller
     }
 
     /**
-     * Menyimpan event baru (Sesuai instruksi soal 9.4.3)
+     * Menyimpan event baru (MULTI-TENANT AUTOMATION)
      */
     public function store(Request $request)
     {
-        // Menerapkan validasi data request dari pengguna
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'title'       => 'required|string|max:255',
@@ -42,34 +54,40 @@ class EventController extends Controller
             'location'    => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|numeric|min:1',
-            'poster'      => 'nullable|image|max:2048' // Maksimal 2MB
+            'poster'      => 'nullable|image|max:2048'
         ]);
 
         if ($request->hasFile('poster')) {
-            // Simpan ke direktori storage/app/public/posters
             $data['poster_path'] = $request->file('poster')->store('posters', 'public');
         }
 
-        // Menyimpan data yang telah divalidasi ke dalam tabel menggunakan Model
+        // --- TAMBAHAN MULTI-TENANT ---
+        // Otomatis masukkan ID User yang sedang login sebagai pembuat (organizer) event ini
+        $data['organizer_id'] = Auth::id();
+
         Event::create($data);
 
         return redirect()->route('admin.events.index')->with('success', 'Data Event berhasil ditambahkan.');
     }
 
     /**
-     * Menampilkan form edit event
+     * Menampilkan form edit event (DENGAN PROTEKSI AKSES)
      */
     public function edit(Event $event)
     {
+        $this->authorizeAccess($event); // Satpam penjaga tenant
+
         $categories = Category::all();
         return view('admin.events.edit', compact('event', 'categories'));
     }
 
     /**
-     * Memperbarui data event (Sesuai instruksi soal 9.4.4)
+     * Memperbarui data event (DENGAN PROTEKSI AKSES)
      */
     public function update(Request $request, Event $event)
     {
+        $this->authorizeAccess($event); // Satpam penjaga tenant
+
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'title'       => 'required|string|max:255',
@@ -82,11 +100,9 @@ class EventController extends Controller
         ]); 
 
         if ($request->hasFile('poster')) {
-            // Hapus gambar lama jika sebelumnya sudah memiliki poster
             if ($event->poster_path) {
                 Storage::disk('public')->delete($event->poster_path);
             }
-            // Upload gambar baru
             $data['poster_path'] = $request->file('poster')->store('posters', 'public');
         }
 
@@ -96,10 +112,12 @@ class EventController extends Controller
     }
 
     /**
-     * Menghapus data event
+     * Menghapus data event (DENGAN PROTEKSI AKSES)
      */
     public function destroy(Event $event)
     {
+        $this->authorizeAccess($event); // Satpam penjaga tenant
+
         if ($event->poster_path) {
             Storage::disk('public')->delete($event->poster_path);
         }
@@ -107,5 +125,18 @@ class EventController extends Controller
         $event->delete();
 
         return redirect()->route('admin.events.index')->with('success', 'Data event berhasil dihapus secara permanen.');
+    }
+
+    /**
+     * FUNGSI BANTUAN (SATPAM PENJAGA TENANT)
+     * Mencegah Organizer A mengedit/menghapus event milik Organizer B lewat URL
+     */
+    private function authorizeAccess(Event $event)
+    {
+        $user = Auth::user();
+        // Jika dia bukan superadmin DAN bukan pemilik event tersebut, blokir aksesnya (Error 403)
+        if ($user->role !== 'superadmin' && $event->organizer_id !== $user->id) {
+            abort(403, 'Akses Ditolak! Kamu tidak memiliki hak atas event dari penyelenggara lain.');
+        }
     }
 }

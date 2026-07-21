@@ -11,7 +11,6 @@
     
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        /* Custom scrollbar untuk sidebar agar lebih halus */
         aside::-webkit-scrollbar { width: 4px; }
         aside::-webkit-scrollbar-thumb { background: #4338ca; border-radius: 10px; }
     </style>
@@ -28,26 +27,59 @@
         <nav class="flex-1 space-y-2">
             <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-4 px-4">Main Menu</p>
             
-            @php
-                $menus = [
-                    ['route' => 'admin.dashboard', 'icon' => 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', 'label' => 'Dashboard'],
-                    ['route' => 'admin.events.index', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 'label' => 'Kelola Event'],
-                    ['route' => 'admin.categories.index', 'icon' => 'M4 6h16M4 12h16M4 18h7', 'label' => 'Kelola Kategori'],
-                    ['route' => 'admin.partners.index', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', 'label' => 'Kelola Partner'],
-                    ['route' => 'admin.transactions.index', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', 'label' => 'Laporan Transaksi'],
-                ];
-            @endphp
+            <!-- 1. MENU UMUM (Bisa dilihat Organizer & Superadmin) -->
+            <a href="{{ route('admin.dashboard') }}" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.dashboard*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+                Dashboard
+            </a>
 
-            @foreach($menus as $menu)
-                <a href="{{ route($menu['route']) }}" 
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 
-                   {{ request()->routeIs($menu['route'] . '*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
-                    <svg class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $menu['icon'] }}"></path>
+            <a href="{{ route('admin.events.index') }}" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.events*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Kelola Event
+            </a>
+
+            <!-- 2. MENU SENSITIF (HANYA BISA DILIHAT SUPERADMIN) -->
+            @if(Auth::check() && Auth::user()->role === 'superadmin')
+                <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mt-6 mb-2 px-4">System Admin</p>
+
+                <a href="{{ route('admin.categories.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.categories*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
                     </svg>
-                    {{ $menu['label'] }}
+                    Kelola Kategori
                 </a>
-            @endforeach
+
+                <a href="{{ route('admin.partners.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.partners*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Kelola Partner
+                </a>
+
+                <a href="{{ route('admin.transactions.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.transactions*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Laporan Transaksi
+                </a>
+
+                <a href="{{ route('admin.users.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.users*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Kelola Pengguna
+                </a>
+            @endif
         </nav>
 
         <div class="pt-6 border-t border-indigo-800/50">
@@ -67,18 +99,28 @@
         <header class="flex justify-between items-start mb-10">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">@yield('page_title', 'Dashboard')</h1>
-                <p class="text-slate-500 font-medium mt-1">@yield('page_subtitle', 'Selamat datang kembali, Admin!')</p>
+                <p class="text-slate-500 font-medium mt-1">@yield('page_subtitle', 'Selamat datang kembali!')</p>
             </div>
             
+            <!-- KOTAK PROFIL ADMIN DINAMIS -->
+            @auth
             <div class="flex items-center gap-4 bg-white p-2 pr-4 rounded-2xl shadow-sm border border-slate-100">
                 <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Avatar">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=6366f1&color=fff" alt="Avatar">
                 </div>
                 <div class="hidden md:block">
-                    <p class="text-sm font-bold leading-none">Administrator</p>
-                    <p class="text-[11px] text-indigo-500 font-bold uppercase mt-1 tracking-wide">Super Admin</p>
+                    <p class="text-sm font-bold leading-none text-slate-800">{{ Auth::user()->name }}</p>
+                    
+                    @if(Auth::user()->role === 'superadmin')
+                        <p class="text-[11px] text-purple-600 font-black uppercase mt-1 tracking-wide">👑 Super Admin</p>
+                    @elseif(Auth::user()->role === 'organizer')
+                        <p class="text-[11px] text-amber-600 font-black uppercase mt-1 tracking-wide">🎪 Organizer Event</p>
+                    @else
+                        <p class="text-[11px] text-slate-500 font-black uppercase mt-1 tracking-wide">👤 Pembeli (User)</p>
+                    @endif
                 </div>
             </div>
+            @endauth
         </header>
 
         @if(session('success'))

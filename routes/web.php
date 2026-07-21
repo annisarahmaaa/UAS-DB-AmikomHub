@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,7 +11,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\MidtransWebhookController; // Impor controller webhook baru
+use App\Http\Controllers\MidtransWebhookController;
+use App\Http\Controllers\Auth\SocialiteController; // tambahan ini untuk integrasi SSO Google
+use App\Http\Controllers\ReviewController; // tambahan ini untuk integrasi fitur review & rating acara
+use App\Http\Controllers\UserController; // TAMBAHAN: untuk integrasi Multi-Tenant & Kelola Pengguna
+
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +38,12 @@ use App\Http\Controllers\Admin\TransactionController;
 // Halaman Utama Publik
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Route untuk Kirim Ulasan & Rating Acara
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+
+// --- TAMBAHAN MULTI-TENANT: Route Upgrade Akun Jadi Organizer ---
+Route::post('/upgrade-organizer', [UserController::class, 'upgradeToOrganizer'])->name('user.upgrade')->middleware('auth');
+
 // Halaman Statis & Informasi
 Route::get('/tentang', function () { return '<h1>Halaman Tentang</h1>'; })->name('about');
 Route::get('/kontak',  function () { return view('contact'); })->name('contact');
@@ -43,18 +54,27 @@ Route::get('/profil',  function () { return view('profil'); })->name('profile');
 Route::get('/katalog', function () { return view('katalog'); })->name('catalog');
 Route::get('/ticket',  function () { return view('ticket'); })->name('ticket');
 
-// Detail Event & Checkout (Midtrans Integrasi)
+// Logout User Biasa
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/');
+})->name('logout');
+
+// Detail Event & Checkout
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('/checkout/{event}', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/checkout/{event}', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/payment/{order_id}', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::get('/success/{order_id}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-// --- INTEGRASI WEBHOOK MIDTRANS CALLBACK ---
-// Ditaruh di rute publik karena ditembak langsung oleh server Midtrans secara POST
+// --- INTEGRASI WEBHOOK MIDTRANS ---
 Route::post('/midtrans/callback', [MidtransWebhookController::class, 'handle'])->name('midtrans.callback');
 
-// Redirect halaman bawaan /login ke halaman login admin resmi
+// --- INTEGRASI SSO GOOGLE ---
+Route::get('/auth/google', [SocialiteController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
+
+// Redirect halaman bawaan /login ke halaman login admin
 Route::get('/login', function () {
     return redirect()->route('admin.login');
 })->name('login');
@@ -66,27 +86,39 @@ Route::get('/login', function () {
 */
 Route::prefix('admin')->name('admin.')->group(function () {
     
-    // [GUEST ONLY] Hanya bisa diakses sebelum admin login
+    // [GUEST ONLY] Area Login Admin
     Route::middleware('guest')->group(function () {
         Route::get('login', [AuthController::class, 'showLogin'])->name('login');
         Route::post('login', [AuthController::class, 'login'])->name('login.post');
     });
 
-    // [PROTECTED] Hanya bisa diakses setelah login & lolos filter AdminMiddleware
+    // [PROTECTED] Area Dalam Admin Panel (Sudah Login)
     Route::middleware(['admin'])->group(function () {
         
-        // Dashboard
+        // =========================================================================
+        // 1. ZONA UMUM (Bisa diakses oleh: ORGANIZER & SUPERADMIN)
+        // =========================================================================
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-        // Master Data & CRUD (Resources)
         Route::resource('events', EventAdminController::class);
-        Route::resource('categories', CategoryController::class);
-        Route::resource('partners', PartnerController::class);
 
-        // Transactions Management
-        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-
-        // Proses Keluar Aplikasi
+        // Logout Admin
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+
+        // =========================================================================
+        // 2. ZONA DEWA (HANYA boleh diakses oleh: SUPERADMIN)
+        // =========================================================================
+        Route::middleware(['admin:superadmin'])->group(function () {
+            
+            // Semua rute sensitif di bawah ini resmi TERGEMBOK dari Organizer biasa:
+            Route::resource('categories', CategoryController::class);
+            Route::resource('partners', PartnerController::class);
+            Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+            
+            // Rute Kelola Pengguna Platform
+            Route::get('/users', [UserController::class, 'index'])->name('users.index');
+            Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
+            
+        });
     });
 });

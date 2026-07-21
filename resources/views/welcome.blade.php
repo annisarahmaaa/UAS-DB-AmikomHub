@@ -13,14 +13,42 @@
             <p class="text-lg text-slate-500 max-w-lg leading-relaxed">
                 Dari konser musik hingga workshop teknologi, semua ada di genggamanmu. Pesan aman & cepat dengan Midtrans.
             </p>
-            <div class="flex gap-4">
+            
+            {{-- TOMBOL CTA HERO YANG UPGRADED & DINAMIS --}}
+            <div class="flex flex-wrap gap-4">
                 <a href="#events" class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:scale-105 transition-transform">
                     Mulai Jelajah
                 </a>
-                <a href="#" class="px-8 py-4 border-2 border-slate-200 rounded-2xl font-bold text-lg hover:border-indigo-600 hover:text-indigo-600 transition">
-                    Cara Pesan
-                </a>
+                
+                @auth
+                    {{-- 1. Jika sudah login tapi masih Pembeli Biasa -> Tombol Upgrade --}}
+                    @if(Auth::user()->role === 'user')
+                        <form action="{{ route('user.upgrade') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" onclick="return confirm('Yakin ingin upgrade akun menjadi Penyelenggara Event? Kamu akan langsung diarahkan ke Dashboard Admin untuk buat acara!')" 
+                                class="px-8 py-4 border-2 border-indigo-600 text-indigo-600 bg-indigo-50/50 hover:bg-indigo-600 hover:text-white rounded-2xl font-bold text-lg transition duration-200 shadow-sm">
+                                🚀 Mulai Jual Tiket
+                            </button>
+                        </form>
+                    
+                    {{-- 2. Jika sudah berstatus Organizer/Superadmin -> Tombol ke Dashboard --}}
+                    @else
+                        <a href="{{ route('admin.events.index') }}" 
+                           class="px-8 py-4 border-2 border-indigo-600 text-indigo-600 bg-indigo-50/50 hover:bg-indigo-600 hover:text-white rounded-2xl font-bold text-lg transition duration-200 shadow-sm">
+                            📊 Dashboard Eventku
+                        </a>
+                    @endif
+
+                {{-- 3. Jika Belum Login -> Arahkan ke Login --}}
+                @else
+                    <a href="{{ route('admin.login') }}" onclick="alert('Silakan login atau daftar terlebih dahulu untuk mulai membuat dan menjual tiket event kampong!')"
+                       class="px-8 py-4 border-2 border-indigo-600 text-indigo-600 bg-indigo-50/50 hover:bg-indigo-600 hover:text-white rounded-2xl font-bold text-lg transition duration-200 shadow-sm">
+                        🚀 Mulai Jual Tiket
+                    </a>
+                @endauth
             </div>
+            {{-- ======================================================= --}}
+
         </div>
         <div class="flex-1 relative">
             <div class="absolute -top-10 -left-10 w-64 h-64 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -75,8 +103,8 @@
                 <div class="relative overflow-hidden aspect-[3/4]">
                     {{-- Menggunakan pengondisian dinamis sesuai instruksi soal 9.4.5 --}}
                     <img src="{{ ($event->poster_path && \Storage::disk('public')->exists($event->poster_path)) ? asset('storage/' . $event->poster_path) : 'https://placehold.co/200x600' }}" 
-                         alt="{{ $event->title }}"
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        alt="{{ $event->title }}"
+                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     
                     <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold uppercase text-indigo-600">
                         {{-- Memanggil relasi nama kategori secara bersambung --}}

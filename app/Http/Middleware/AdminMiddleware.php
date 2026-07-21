@@ -11,18 +11,27 @@ class AdminMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, $role = null): Response
     {
-        // 1. Cek apakah user sudah login atau belum
+        // 1. Cek apakah user sudah login
         if (!Auth::check()) {
-            // Jika belum login, tendang paksa ke halaman login admin
             return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu untuk mengakses dashboard.');
         }
 
-        // 2. Jika sudah login, izinkan mereka melanjutkan ke rute yang dituju (dashboard, events, dll)
-        return $next($request);
+        $user = Auth::user();
+
+        // 2. MODE KETAT: Jika rute meminta 'superadmin', pastikan rolenya benar-benar superadmin!
+        if ($role === 'superadmin' && $user->role !== 'superadmin') {
+            abort(403, 'BAHAYA! Kamu tidak memiliki hak akses Superadmin untuk menu manajemen sistem ini.');
+        }
+
+        // 3. MODE UMUM: Izinkan masuk JIKA rolenya 'superadmin' ATAU 'organizer'
+        if ($user->role === 'superadmin' || $user->role === 'organizer') {
+            return $next($request);
+        }
+
+        // 4. Jika masih user biasa, blokir aksesnya!
+        abort(403, 'Akses Ditolak! Kamu harus menjadi Penyelenggara Event atau Superadmin untuk mengakses halaman ini.');
     }
 }
