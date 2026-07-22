@@ -45,6 +45,21 @@
     </div>
 </div>
 
+<!-- BAGIAN GRAFIK PERTUMBUHAN (CHART.JS) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+    <!-- Chart Pertumbuhan Event -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <h4 class="font-bold text-slate-800 mb-4">Pertumbuhan Event (Tahun Ini)</h4>
+        <canvas id="eventGrowthChart" height="100"></canvas>
+    </div>
+
+    <!-- Chart Pertumbuhan User -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <h4 class="font-bold text-slate-800 mb-4">Pendaftaran User (Tahun Ini)</h4>
+        <canvas id="userGrowthChart" height="100"></canvas>
+    </div>
+</div>
+
 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
     <div class="p-8 border-b flex justify-between items-center">
         <h3 class="font-black text-xl">Transaksi Terakhir</h3>
@@ -109,4 +124,61 @@
         </table>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    // Data dari Controller
+    const eventGrowthData = @json($eventGrowthData ?? array_fill(0, 12, 0));
+    const userGrowthData = @json($userGrowthData ?? array_fill(0, 12, 0));
+
+    // Chart Event (Bar)
+    const ctxEvent = document.getElementById('eventGrowthChart').getContext('2d');
+    new Chart(ctxEvent, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Event Baru',
+                data: eventGrowthData,
+                backgroundColor: 'rgba(99, 102, 241, 0.2)', // indigo-500
+                borderColor: 'rgba(99, 102, 241, 1)',
+                borderWidth: 2,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    // Chart User (Line)
+    const ctxUser = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(ctxUser, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'User Baru',
+                data: userGrowthData,
+                backgroundColor: 'rgba(16, 185, 129, 0.2)', // emerald-500
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 2,
+                tension: 0.3, // smooth curve
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+</script>
 @endsection

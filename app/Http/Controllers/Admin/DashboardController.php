@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Event;        
 use App\Models\Transaction; 
+use App\Models\User;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -62,12 +63,44 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // 4. Kalkulasi data untuk Grafik Pertumbuhan (Chart.js)
+        $currentYear = date('Y');
+
+        // Pertumbuhan User (Semua User di platform, biasanya hanya relevan untuk Superadmin, tapi kita tampilkan saja jika diminta)
+        $userGrowth = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->whereYear('created_at', $currentYear)
+            ->groupBy('month')
+            ->pluck('count', 'month')
+            ->toArray();
+        
+        $userGrowthData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $userGrowthData[] = $userGrowth[$i] ?? 0;
+        }
+
+        // Pertumbuhan Event (jika superadmin tampilkan semua, jika organizer tampilkan miliknya)
+        $eventGrowthQuery = Event::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->whereYear('created_at', $currentYear)
+            ->groupBy('month');
+            
+        if (!$isSuperAdmin) {
+            $eventGrowthQuery->where('organizer_id', $user->id);
+        }
+        
+        $eventGrowth = $eventGrowthQuery->pluck('count', 'month')->toArray();
+        $eventGrowthData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $eventGrowthData[] = $eventGrowth[$i] ?? 0;
+        }
+
         return view('admin.dashboard', compact(
             'totalRevenue',
             'ticketsSold',
             'activeEvents',
             'pendingOrders',
-            'recentTransactions'
+            'recentTransactions',
+            'userGrowthData',
+            'eventGrowthData'
         ));
     }
 }

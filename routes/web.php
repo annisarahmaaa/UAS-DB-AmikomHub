@@ -66,6 +66,7 @@ Route::get('/checkout/{event}', [CheckoutController::class, 'create'])->name('ch
 Route::post('/checkout/{event}', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/payment/{order_id}', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::get('/success/{order_id}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/e-ticket/{order_id}', [CheckoutController::class, 'ticket'])->name('checkout.ticket');
 
 // --- INTEGRASI WEBHOOK MIDTRANS ---
 Route::post('/midtrans/callback', [MidtransWebhookController::class, 'handle'])->name('midtrans.callback');

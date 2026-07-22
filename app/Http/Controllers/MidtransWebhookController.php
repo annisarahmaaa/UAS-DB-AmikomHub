@@ -24,7 +24,7 @@ class MidtransWebhookController extends Controller
         $transaction = Transaction::with('event')->where('order_id', $orderId)->first();
 
         if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
+            return response()->json(['message' => 'Transaction not found'], 200);
         }
 
         // Cegah proses berulang jika status sudah lunas/sukses
@@ -44,7 +44,13 @@ class MidtransWebhookController extends Controller
             $transaction->status = 'settlement';
             $this->processSuccess($transaction);
         } else if (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
-            $transaction->status = 'failed';
+            // Jika sebelumnya belum berstatus failed, maka kembalikan stok tiket (Release Reserved Ticket)
+            if ($transaction->status !== 'failed') {
+                $transaction->status = 'failed';
+                if ($transaction->event) {
+                    $transaction->event->increment('stock');
+                }
+            }
         } else if ($transactionStatus == 'pending') {
             $transaction->status = 'pending';
         }
@@ -55,21 +61,14 @@ class MidtransWebhookController extends Controller
 
     private function processSuccess(Transaction $transaction)
     {
-        $event = $transaction->event;
-
-        // Jika tiket masih ada dan terhubung dengan data event, kurangi jumlahnya sebanyak 1
-        if ($event && $event->stock > 0) {
-            $event->stock = $event->stock - 1;
-            $event->save();
-
-            // Mengirimkan email E-Ticket ke pelanggan
-            try {
-                Mail::to($transaction->customer_email)->send(new \App\Mail\EventTicketMail($transaction));
-            } catch (\Exception $e) {
-                Log::error('Gagal mengirim email E-Ticket: ' . $e->getMessage());
-            }
-        } else {
-            Log::warning('Stock habis setelah pembayaran berhasil (Perlu proses refund opsional). Order: ' . $transaction->order_id);
+        // Mengirimkan email E-Ticket ke pelanggan
+        try {
+            Mail::to($transaction->customer_email)->send(new \App\Mail\EventTicketMail($transaction));
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email E-Ticket: ' . $e->getMessage());
         }
+
+        // Kirim E-Ticket via WhatsApp
+        \App\Services\WhatsAppService::sendTicket($transaction);
     }
 }

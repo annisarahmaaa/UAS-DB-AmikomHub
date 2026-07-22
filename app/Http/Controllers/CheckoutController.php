@@ -29,9 +29,10 @@ class CheckoutController extends Controller
             'customer_phone' => 'required|string|max:20',
         ]);
 
-        // 2. Cegah Check-out Jika Tiket Habis
-        if ($event->stock <= 0) {
-            return back()->with('error', 'Mohon maaf, tiket untuk acara ini sudah habis.');
+        // 2. TAHAN STOK TIKET (Reserved Ticket) - Mencegah Race Condition
+        $updated = Event::where('id', $event->id)->where('stock', '>', 0)->decrement('stock');
+        if (!$updated) {
+            return back()->with('error', 'Mohon maaf, tiket untuk acara ini sudah habis atau sedang dipesan orang lain.');
         }
 
         // 3. Generate Kode TRX (Unik)
@@ -48,6 +49,9 @@ class CheckoutController extends Controller
             'total_price' => $totalPrice,
             'status' => 'Pending', // Status Awal
         ]);
+
+        // 5. Dispatch Job untuk Mengirim Link Pembayaran via WhatsApp (Instan)
+        \App\Jobs\CheckAbandonedCart::dispatch($transaction);
 
         // --- INTEGRASI SNAP MIDTRANS ---
         
@@ -67,6 +71,11 @@ class CheckoutController extends Controller
                 'first_name' => $request->customer_name,
                 'email' => $request->customer_email,
                 'phone' => $request->customer_phone,
+            ],
+            'custom_expiry' => [
+                'order_time' => date('Y-m-d H:i:s O'),
+                'expiry_duration' => 15,
+                'unit' => 'minute'
             ],
         ];
 
@@ -127,28 +136,32 @@ class CheckoutController extends Controller
                     if (strtolower($transaction->status) === 'pending' || strtolower($transaction->status) === 'challenge') {
                         $transaction->update(['status' => 'success']);
 
-                        // Kurangi stok tiket jika masih tersedia
-                        if ($transaction->event && $transaction->event->stock > 0) {
-                            $transaction->event->stock = $transaction->event->stock - 1;
-                            $transaction->event->save();
-
-                            // Kirim Email secara manual
-                            try {
-                                \Illuminate\Support\Facades\Mail::to($transaction->customer_email)
-                                    ->send(new \App\Mail\EventTicketMail($transaction));
-                            } catch (\Exception $e) {
-                                \Illuminate\Support\Facades\Log::error('Gagal mengirim email E-Ticket secara manual (Bypass): ' . $e->getMessage());
-                            }
+                        // Kirim Email secara manual
+                        try {
+                            \Illuminate\Support\Facades\Mail::to($transaction->customer_email)
+                                ->send(new \App\Mail\EventTicketMail($transaction));
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error('Gagal mengirim email E-Ticket secara manual (Bypass): ' . $e->getMessage());
                         }
+
+                        // Kirim E-Ticket via WhatsApp
+                        \App\Services\WhatsAppService::sendTicket($transaction);
                     }
                 }
             }
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Midtrans API Error: ' . $e->getMessage());
             // Jika terjadi error dari API Midtrans (transaksi tidak valid), kembalikan ke beranda
-            return redirect()->route('home')->with('error', 'Transaksi tidak ditemukan atau gagal diproses oleh sistem pembayaran.');
+            return redirect()->route('home')->with('error', 'Transaksi tidak ditemukan atau gagal diproses oleh sistem pembayaran: ' . $e->getMessage());
         }
 
         return view('checkout.success', compact('transaction', 'categories'));
+    }
+
+    public function ticket($order_id)
+    {
+        $transaction = Transaction::with('event')->where('order_id', $order_id)->firstOrFail();
+        return view('emails.ticket', compact('transaction'));
     }
 }
