@@ -102,6 +102,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // =========================================================================
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('events', EventAdminController::class);
+        
+        // Fitur Check-in Scanner
+        Route::get('/scanner', [\App\Http\Controllers\Admin\CheckinController::class, 'index'])->name('scanner');
+        Route::post('/checkin', [\App\Http\Controllers\Admin\CheckinController::class, 'process'])->name('checkin');
 
         // Logout Admin
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
