@@ -31,4 +31,37 @@ class Event extends Model
     {
         return $this->belongsTo(User::class, 'organizer_id');
     }
+
+    /**
+     * Relasi ke TicketTier untuk Dynamic Pricing
+     */
+    public function ticketTiers()
+    {
+        return $this->hasMany(TicketTier::class);
+    }
+
+    /**
+     * Mengambil harga aktif berdasarkan tanggal sekarang
+     * Mengembalikan array ['price' => int, 'tier_name' => string|null]
+     */
+    public function getActivePrice()
+    {
+        $now = now();
+        $activeTier = $this->ticketTiers()
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->first();
+
+        if ($activeTier) {
+            return [
+                'price' => $activeTier->price,
+                'tier_name' => $activeTier->name
+            ];
+        }
+
+        return [
+            'price' => $this->price,
+            'tier_name' => 'Regular'
+        ];
+    }
 }

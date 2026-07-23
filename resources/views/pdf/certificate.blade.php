@@ -117,31 +117,29 @@
             font-size: 16px;
             color: #7f8c8d;
             font-style: italic;
+            padding-bottom: 120px; /* Jarak aman agar tidak bertabrakan dengan tanda tangan */
         }
 
         /* Tanda Tangan */
-        .signatures {
+        .signatures-table {
             position: absolute;
-            bottom: 60px;
-            left: 80px;
-            right: 80px;
+            bottom: 30px; /* Kunci tabel 30px dari batas bawah .border-inner */
+            left: 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .signatures-table td {
+            width: 33.33%;
+            vertical-align: bottom;
             text-align: center;
-        }
-
-        .sign-left {
-            float: left;
-            width: 250px;
-        }
-
-        .sign-right {
-            float: right;
-            width: 250px;
         }
 
         .sign-line {
             border-bottom: 1px solid #2c3e50;
-            margin-top: 60px; /* Jarak untuk ruang tanda tangan/stempel */
-            margin-bottom: 10px;
+            margin: 0 auto 10px auto;
+            width: 80%;
+            padding-top: 60px; /* Jarak untuk ruang tanda tangan */
         }
 
         .sign-name {
@@ -157,10 +155,7 @@
         }
         
         .badge {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            margin-left: -50px; /* Setengah dari width */
+            display: inline-block;
             width: 100px;
             height: 100px;
             background-color: #b8860b;
@@ -174,6 +169,7 @@
             font-family: 'Arial', sans-serif;
             font-size: 12px;
             letter-spacing: 1px;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -200,26 +196,25 @@
             Held on {{ \Carbon\Carbon::parse($transaction->event->date)->format('F d, Y') }} at {{ $transaction->event->location }}
         </div>
         
-        <!-- Tanda Tangan -->
-        <div class="signatures">
-            <div class="sign-left">
-                <div class="sign-line"></div>
-                <div class="sign-name">Event Organizer</div>
-                <div class="sign-title">Authorized Signature</div>
-            </div>
-            
-            <!-- Elemen Stempel/Medali di Tengah Bawah -->
-            <div class="badge">OFFICIAL</div>
-            
-            <div class="sign-right">
-                <div class="sign-line"></div>
-                <div class="sign-name">{{ \Carbon\Carbon::parse($transaction->event->date)->format('F d, Y') }}</div>
-                <div class="sign-title">Date</div>
-            </div>
-            
-            <!-- Clearfix untuk float -->
-            <div style="clear: both;"></div>
-        </div>
+        <!-- Tanda Tangan (Tabel) -->
+        <table class="signatures-table">
+            <tr>
+                <td>
+                    <div class="sign-line"></div>
+                    <div class="sign-name">Event Organizer</div>
+                    <div class="sign-title">Authorized Signature</div>
+                </td>
+                <td>
+                    <!-- Elemen Stempel/Medali di Tengah Bawah -->
+                    <div class="badge">OFFICIAL</div>
+                </td>
+                <td>
+                    <div class="sign-line"></div>
+                    <div class="sign-name">{{ \Carbon\Carbon::parse($transaction->event->date)->format('F d, Y') }}</div>
+                    <div class="sign-title">Date</div>
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

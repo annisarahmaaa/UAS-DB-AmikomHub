@@ -3,6 +3,12 @@
 @section('title', 'Checkout - ' . $event->title)
 
 @section('content')
+@php
+    $activePriceData = $event->getActivePrice();
+    $activePrice = $activePriceData['price'];
+    $tierName = $activePriceData['tier_name'];
+    $adminFee = 5000;
+@endphp
 <main class="max-w-3xl mx-auto px-6 py-20">
     <div class="mb-12">
         <a href="{{ route('events.show', $event->id) }}" class="text-indigo-600 font-bold flex items-center gap-2 mb-6">
@@ -30,22 +36,44 @@
                 <div>
                     <h4 class="font-extrabold text-lg">{{ $event->title }}</h4>
                     <p class="text-slate-500">{{ $event->date->format('d M Y') }} • {{ $event->location }}</p>
-                    <p class="text-indigo-600 font-bold mt-2">1 x Rp {{ number_format($event->price, 0, ',', '.') }}</p>
+                    <div class="mt-2 flex items-center gap-2">
+                        @if($tierName !== 'Regular')
+                            <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-lg uppercase tracking-wide">{{ $tierName }}</span>
+                        @endif
+                        <p class="text-indigo-600 font-bold">1 x Rp {{ number_format($activePrice, 0, ',', '.') }}</p>
+                    </div>
                 </div>
             </div>
             
             <div class="mt-8 pt-6 border-t space-y-3">
                 <div class="flex justify-between text-slate-500">
-                    <span>Harga Tiket</span>
-                    <span>Rp {{ number_format($event->price, 0, ',', '.') }}</span>
+                    <span>Harga Tiket <span class="text-xs text-slate-400">({{ $tierName }})</span></span>
+                    <span>Rp {{ number_format($activePrice, 0, ',', '.') }}</span>
                 </div>
+                
+                <!-- Section Kupon -->
+                <div class="py-4 my-2 border-y border-dashed">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Punya Kode Promo/Voucher?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="couponInput" placeholder="Masukkan kode kupon..." class="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium uppercase">
+                        <button type="button" id="applyCouponBtn" class="px-6 py-2 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition">Terapkan</button>
+                    </div>
+                    <p id="couponMessage" class="text-sm font-semibold mt-2 hidden"></p>
+                </div>
+                <!-- End Section Kupon -->
+
+                <div class="flex justify-between text-emerald-600 font-bold hidden" id="discountRow">
+                    <span>Diskon (<span id="discountLabel"></span>)</span>
+                    <span>- Rp <span id="discountAmount">0</span></span>
+                </div>
+
                 <div class="flex justify-between text-slate-500">
                     <span>Biaya Layanan</span>
-                    <span>Rp 5.000</span>
+                    <span>Rp {{ number_format($adminFee, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between text-2xl font-black mt-4 pt-4 border-t">
                     <span>Total Bayar</span>
-                    <span class="text-indigo-600">Rp {{ number_format($event->price + 5000, 0, ',', '.') }}</span>
+                    <span class="text-indigo-600">Rp <span id="totalPayLabel">{{ number_format($activePrice + $adminFee, 0, ',', '.') }}</span></span>
                 </div>
             </div>
         </div>
@@ -55,6 +83,9 @@
             
             <form action="{{ route('checkout.store', $event->id) }}" method="POST" class="space-y-6">
                 @csrf
+                <!-- Input hidden untuk mengirim kupon ke backend -->
+                <input type="hidden" name="applied_coupon" id="appliedCouponInput" value="">
+                
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Nama Lengkap</label>
                     <input type="text" name="customer_name" placeholder="Masukkan nama sesuai identitas"
@@ -87,4 +118,78 @@
         </div>
     </div>
 </main>
+
+<script>
+    const activePrice = {{ $activePrice }};
+    const adminFee = {{ $adminFee }};
+    
+    document.getElementById('applyCouponBtn').addEventListener('click', async function() {
+        const code = document.getElementById('couponInput').value.trim();
+        const msgEl = document.getElementById('couponMessage');
+        const applyBtn = this;
+        
+        if(!code) return;
+        
+        applyBtn.innerText = 'Mengecek...';
+        applyBtn.disabled = true;
+        msgEl.classList.add('hidden');
+        
+        try {
+            const response = await fetch(`/api/coupons/validate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ 
+                    code: code,
+                    total_price: activePrice,
+                    event_id: {{ $event->id }}
+                })
+            });
+            
+            const data = await response.json();
+            
+            if(data.success) {
+                // Berhasil
+                msgEl.innerText = data.message;
+                msgEl.className = "text-sm font-semibold mt-2 text-emerald-600";
+                msgEl.classList.remove('hidden');
+                
+                // Update UI Total
+                const discount = data.discount;
+                document.getElementById('discountRow').classList.remove('hidden');
+                document.getElementById('discountLabel').innerText = data.code;
+                document.getElementById('discountAmount').innerText = discount.toLocaleString('id-ID');
+                
+                const finalTotal = activePrice - discount + adminFee;
+                document.getElementById('totalPayLabel').innerText = finalTotal.toLocaleString('id-ID');
+                
+                // Set hidden input form
+                document.getElementById('appliedCouponInput').value = data.code;
+            } else {
+                // Gagal
+                msgEl.innerText = data.message || "Kupon tidak valid.";
+                msgEl.className = "text-sm font-semibold mt-2 text-rose-600";
+                msgEl.classList.remove('hidden');
+                
+                // Reset UI
+                document.getElementById('discountRow').classList.add('hidden');
+                const finalTotal = activePrice + adminFee;
+                document.getElementById('totalPayLabel').innerText = finalTotal.toLocaleString('id-ID');
+                document.getElementById('appliedCouponInput').value = "";
+            }
+            
+        } catch (error) {
+            console.error(error);
+            msgEl.innerText = "Terjadi kesalahan saat memvalidasi kupon.";
+            msgEl.className = "text-sm font-semibold mt-2 text-rose-600";
+            msgEl.classList.remove('hidden');
+        } finally {
+            applyBtn.innerText = 'Terapkan';
+            applyBtn.disabled = false;
+        }
+    });
+</script>
 @endsection

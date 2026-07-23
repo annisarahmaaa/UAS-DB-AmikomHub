@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Transaction;
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -37,7 +38,35 @@ class CheckoutController extends Controller
 
         // 3. Generate Kode TRX (Unik)
         $orderId = 'TRX-' . time() . '-' . Str::random(5);
-        $totalPrice = $event->price + 5000; // Menambahkan biaya admin (dummy)
+        
+        // --- DYNAMIC PRICING & COUPON LOGIC ---
+        $activePriceData = $event->getActivePrice();
+        $basePrice = $activePriceData['price'];
+        $tierName = $activePriceData['tier_name'] !== 'Regular' ? $activePriceData['tier_name'] : null;
+        
+        $discountAmount = 0;
+        $appliedCoupon = null;
+
+        if ($request->filled('applied_coupon')) {
+            $coupon = Coupon::where('code', strtoupper($request->applied_coupon))
+                            ->where(function($q) use ($event) {
+                                $q->whereNull('event_id')
+                                  ->orWhere('event_id', $event->id);
+                            })
+                            ->first();
+            
+            if ($coupon && $coupon->isValid()) {
+                $discountAmount = $coupon->calculateDiscount($basePrice);
+                $appliedCoupon = $coupon->code;
+                
+                // Tambah usage count
+                $coupon->increment('used_count');
+            }
+        }
+
+        $adminFee = 5000;
+        $totalPrice = $basePrice - $discountAmount + $adminFee;
+        // --- END DYNAMIC PRICING ---
 
         // 4. Merekam Transaksi ke Database
         $transaction = Transaction::create([
@@ -48,6 +77,9 @@ class CheckoutController extends Controller
             'customer_phone' => $request->customer_phone,
             'total_price' => $totalPrice,
             'status' => 'Pending', // Status Awal
+            'coupon_code' => $appliedCoupon,
+            'discount_amount' => $discountAmount,
+            'ticket_tier_name' => $tierName,
         ]);
 
         // 5. Dispatch Job untuk Mengirim Link Pembayaran via WhatsApp (Instan)

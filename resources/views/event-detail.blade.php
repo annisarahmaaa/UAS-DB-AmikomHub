@@ -83,10 +83,17 @@
             <div class="bg-indigo-600 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
                 <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div>
-                        <p class="text-indigo-200 font-bold uppercase tracking-widest text-sm mb-2">Harga Tiket</p>
+                        @php
+                            $activePriceData = $event->getActivePrice();
+                        @endphp
+                        @if($activePriceData['tier_name'] !== 'Regular')
+                            <p class="text-amber-300 font-bold uppercase tracking-widest text-sm mb-2">⭐ Harga {{ $activePriceData['tier_name'] }}!</p>
+                        @else
+                            <p class="text-indigo-200 font-bold uppercase tracking-widest text-sm mb-2">Harga Tiket</p>
+                        @endif
                         <h2 class="text-5xl font-black">
-                            @if($event->price > 0)
-                                Rp {{ number_format($event->price, 0, ',', '.') }} <span class="text-lg font-medium text-indigo-200">/ orang</span>
+                            @if($activePriceData['price'] > 0)
+                                Rp {{ number_format($activePriceData['price'], 0, ',', '.') }} <span class="text-lg font-medium text-indigo-200">/ orang</span>
                             @else
                                 Gratis
                             @endif

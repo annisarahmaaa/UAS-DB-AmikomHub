@@ -64,6 +64,9 @@ Route::post('/logout', function () {
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('/checkout/{event}', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/checkout/{event}', [CheckoutController::class, 'store'])->name('checkout.store');
+
+// Validasi Kupon via AJAX
+Route::post('/api/coupons/validate', [\App\Http\Controllers\Api\CouponController::class, 'validateCoupon'])->name('api.coupons.validate');
 Route::get('/payment/{order_id}', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::get('/success/{order_id}', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/e-ticket/{order_id}', [CheckoutController::class, 'ticket'])->name('checkout.ticket');
@@ -102,6 +105,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // =========================================================================
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('events', EventAdminController::class);
+        Route::resource('events.tiers', \App\Http\Controllers\Admin\TicketTierController::class);
+        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
         
         // Fitur Check-in Scanner
         Route::get('/scanner', [\App\Http\Controllers\Admin\CheckinController::class, 'index'])->name('scanner');
