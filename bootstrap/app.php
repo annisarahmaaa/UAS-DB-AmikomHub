@@ -45,6 +45,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
 if ($storagePath) {
     $app->useStoragePath($storagePath);
+    $app->useBootstrapPath('/tmp/storage/bootstrap');
+    if (!is_dir('/tmp/storage/bootstrap/cache')) {
+        @mkdir('/tmp/storage/bootstrap/cache', 0777, true);
+    }
 }
 
 return $app;
