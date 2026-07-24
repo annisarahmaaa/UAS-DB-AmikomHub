@@ -17,22 +17,22 @@ foreach ($storageFolders as $folder) {
 
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 
+define('LARAVEL_START', microtime(true));
+
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
 // 2. Autoload Composer & Bootstrap Application
 require __DIR__ . '/../vendor/autoload.php';
 
+/** @var \Illuminate\Foundation\Application $app */
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 // 3. Alihkan Storage Path ke /tmp/storage
 $app->useStoragePath('/tmp/storage');
 
-// 4. Jalankan HTTP Kernel
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+// 4. Handle Request (Laravel 11/13 Standard)
+$app->handleRequest(\Illuminate\Http\Request::capture());
 
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
-
-$response->send();
-
-$kernel->terminate($request, $response);
 
