@@ -39,8 +39,8 @@
 
                     {{-- Poster (Sesuai instruksi soal 9.4.5) --}}
                     <td class="px-8 py-6">
-                        <img src="{{ ($event->poster_path && \Storage::disk('public')->exists($event->poster_path)) ? asset('storage/' . $event->poster_path) : 'https://placehold.co/16x20' }}" 
-                            class="w-16 h-20 rounded-xl object-cover shadow-sm">
+                        <img src="{{ $event->poster_url }}" 
+                             alt="{{ $event->title }}" class="w-12 h-16 object-cover rounded-xl shadow-sm">
                     </td>
 
                     {{-- Informasi --}}

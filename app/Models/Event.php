@@ -17,6 +17,28 @@ class Event extends Model
     ];
 
     /**
+     * Accessor untuk mendapatkan URL lengkap gambar poster (Supabase S3 / Local / URL Direct)
+     */
+    public function getPosterUrlAttribute()
+    {
+        if (!$this->poster_path) {
+            return 'https://placehold.co/400x600?text=No+Poster';
+        }
+
+        if (str_starts_with($this->poster_path, 'http://') || str_starts_with($this->poster_path, 'https://')) {
+            return $this->poster_path;
+        }
+
+        $disk = config('filesystems.default', 'public');
+
+        if ($disk === 's3' || env('FILESYSTEM_DISK') === 's3') {
+            return "https://bbzlfbrcsryqtajywivj.supabase.co/storage/v1/object/public/events/" . ltrim($this->poster_path, '/');
+        }
+
+        return asset('storage/' . $this->poster_path);
+    }
+
+    /**
      * Menandakan atribut: 1 Event harus terpaut pada satu wujud Kategori
      */
     public function category()

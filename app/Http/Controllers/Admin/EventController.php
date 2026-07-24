@@ -57,8 +57,10 @@ class EventController extends Controller
             'poster'      => 'nullable|image|max:2048'
         ]);
 
+        $disk = config('filesystems.default', 'public');
+
         if ($request->hasFile('poster')) {
-            $data['poster_path'] = $request->file('poster')->store('posters', 'public');
+            $data['poster_path'] = $request->file('poster')->store('posters', $disk);
         }
 
         // --- TAMBAHAN MULTI-TENANT ---
@@ -99,11 +101,13 @@ class EventController extends Controller
             'poster'      => 'nullable|image|max:2048'
         ]); 
 
+        $disk = config('filesystems.default', 'public');
+
         if ($request->hasFile('poster')) {
             if ($event->poster_path) {
-                Storage::disk('public')->delete($event->poster_path);
+                Storage::disk($disk)->delete($event->poster_path);
             }
-            $data['poster_path'] = $request->file('poster')->store('posters', 'public');
+            $data['poster_path'] = $request->file('poster')->store('posters', $disk);
         }
 
         $event->update($data);
@@ -118,8 +122,10 @@ class EventController extends Controller
     {
         $this->authorizeAccess($event); // Satpam penjaga tenant
 
+        $disk = config('filesystems.default', 'public');
+
         if ($event->poster_path) {
-            Storage::disk('public')->delete($event->poster_path);
+            Storage::disk($disk)->delete($event->poster_path);
         }
 
         $event->delete();

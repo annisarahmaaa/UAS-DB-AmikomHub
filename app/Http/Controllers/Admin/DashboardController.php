@@ -41,11 +41,11 @@ class DashboardController extends Controller
 
         // 3. Kalkulasi data matematis real-time (disesuaikan dengan filter role)
         $totalRevenue = (clone $transactionQuery)
-            ->whereIn('status', ['settlement', 'success'])
+            ->whereIn(\Illuminate\Support\Facades\DB::raw('LOWER(status)'), ['settlement', 'success', 'used', 'paid', 'capture'])
             ->sum('total_price');
 
         $ticketsSold = (clone $transactionQuery)
-            ->whereIn('status', ['settlement', 'success'])
+            ->whereIn(\Illuminate\Support\Facades\DB::raw('LOWER(status)'), ['settlement', 'success', 'used', 'paid', 'capture'])
             ->count();
 
         // Untuk event aktif, jika organizer ambil dari collection $events yang sudah difilter
@@ -65,11 +65,13 @@ class DashboardController extends Controller
 
         // 4. Kalkulasi data untuk Grafik Pertumbuhan (Chart.js)
         $currentYear = date('Y');
+        $driver = \Illuminate\Support\Facades\DB::getDriverName();
+        $monthExpr = $driver === 'pgsql' ? 'EXTRACT(MONTH FROM created_at)' : 'MONTH(created_at)';
 
-        // Pertumbuhan User (Semua User di platform, biasanya hanya relevan untuk Superadmin, tapi kita tampilkan saja jika diminta)
-        $userGrowth = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+        // Pertumbuhan User (Semua User di platform)
+        $userGrowth = User::selectRaw("{$monthExpr} as month, COUNT(*) as count")
             ->whereYear('created_at', $currentYear)
-            ->groupBy('month')
+            ->groupByRaw($monthExpr)
             ->pluck('count', 'month')
             ->toArray();
         
@@ -78,10 +80,10 @@ class DashboardController extends Controller
             $userGrowthData[] = $userGrowth[$i] ?? 0;
         }
 
-        // Pertumbuhan Event (jika superadmin tampilkan semua, jika organizer tampilkan miliknya)
-        $eventGrowthQuery = Event::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+        // Pertumbuhan Event
+        $eventGrowthQuery = Event::selectRaw("{$monthExpr} as month, COUNT(*) as count")
             ->whereYear('created_at', $currentYear)
-            ->groupBy('month');
+            ->groupByRaw($monthExpr);
             
         if (!$isSuperAdmin) {
             $eventGrowthQuery->where('organizer_id', $user->id);

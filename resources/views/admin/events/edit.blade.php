@@ -88,7 +88,7 @@
                 
                 @if($event->poster_path)
                 <div class="mb-4 flex items-center gap-4 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                    <img src="{{ asset('storage/' . $event->poster_path) }}" class="w-20 h-28 object-cover rounded-xl shadow-md">
+                    <img src="{{ $event->poster_url }}" class="w-20 h-28 object-cover rounded-xl shadow-md">
                     <div>
                         <p class="text-sm font-bold text-indigo-900">Poster Saat Ini</p>
                         <p class="text-xs text-indigo-500">Abaikan jika tidak ingin mengubah poster.</p>
