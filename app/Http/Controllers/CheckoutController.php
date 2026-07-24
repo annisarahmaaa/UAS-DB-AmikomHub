@@ -139,6 +139,14 @@ class CheckoutController extends Controller
             // Update rekaman kita bahwa transaksi terkait sudah memiliki id token pelunasan
             $transaction->update(['snap_token' => $snapToken]);
 
+            // Kirim Email Instruksi / Link Pembayaran ke email pelanggan
+            try {
+                \Illuminate\Support\Facades\Mail::to($transaction->customer_email)
+                    ->send(new \App\Mail\PaymentReminderMail($transaction));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Gagal mengirim Payment Reminder email: ' . $e->getMessage());
+            }
+
             // Redirect ke halaman antarmuka pembayaran final pelanggan
             return redirect()->route('checkout.payment', $transaction->order_id);
 
