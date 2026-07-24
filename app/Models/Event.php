@@ -31,7 +31,7 @@ class Event extends Model
 
         $disk = config('filesystems.default', 'public');
 
-        if ($disk === 's3' || env('FILESYSTEM_DISK') === 's3') {
+        if ($disk === 's3' || env('FILESYSTEM_DISK') === 's3' || isset($_SERVER['VERCEL']) || getenv('VERCEL')) {
             return "https://bbzlfbrcsryqtajywivj.supabase.co/storage/v1/object/public/events/" . ltrim($this->poster_path, '/');
         }
 

@@ -57,9 +57,9 @@ class CheckinController extends Controller
         // Ubah status menjadi used
         $transaction->update(['status' => 'used']);
 
-        // Kirim E-Certificate ke email peserta secara background (queue) agar respons instan
+        // Kirim E-Certificate ke email peserta secara langsung (synchronous) untuk kompatibilitas Vercel (tanpa antrean)
         try {
-            Mail::to($transaction->customer_email)->queue(new ECertificateMail($transaction));
+            Mail::to($transaction->customer_email)->send(new ECertificateMail($transaction));
         } catch (\Exception $e) {
             // Log error namun tetap lanjutkan check-in
             \Illuminate\Support\Facades\Log::error('Gagal mengirim E-Certificate: ' . $e->getMessage());

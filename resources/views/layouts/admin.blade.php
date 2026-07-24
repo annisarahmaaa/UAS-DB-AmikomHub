@@ -127,6 +127,7 @@
                         <p class="text-slate-500 font-medium mt-1">@yield('page_subtitle')</p>
                     @endif
                 @endif
+                </div>
             </div>
             
             <!-- KOTAK PROFIL ADMIN DINAMIS -->

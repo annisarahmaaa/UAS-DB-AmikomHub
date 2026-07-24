@@ -34,47 +34,53 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch from Cache first, then Network
+// Fetch from Cache first for assets, but Network First for HTML and API
 self.addEventListener('fetch', event => {
-  // Jangan cache request POST, PUT, DELETE, dll. Hanya GET.
+  // Hanya proses metode GET
   if (event.request.method !== 'GET') {
       return;
   }
   
+  // BYPASS: Jangan cache rute admin atau otentikasi
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/login') || url.pathname.startsWith('/midtrans')) {
+      return;
+  }
+
+  // Jika ini permintaan halaman HTML (Navigation), gunakan NETWORK FIRST
+  if (event.request.mode === 'navigate' || event.request.headers.get('accept').includes('text/html')) {
+      event.respondWith(
+          fetch(event.request)
+              .then(response => {
+                  return caches.open(CACHE_NAME).then(cache => {
+                      cache.put(event.request, response.clone());
+                      return response;
+                  });
+              })
+              .catch(() => {
+                  return caches.match(event.request);
+              })
+      );
+      return;
+  }
+  
+  // STRATEGI CACHE FIRST (Untuk file statis: CSS, JS, Image)
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
         if (response) {
           return response;
         }
-
-        return fetch(event.request).then(
-          function(response) {
-            // Check if we received a valid response
+        return fetch(event.request).then(response => {
             if(!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
-
-            // Mencegah cache untuk request tertentu seperti API midtrans
-            if (event.request.url.includes('midtrans')) {
-                return response;
-            }
-
             var responseToCache = response.clone();
-
             caches.open(CACHE_NAME)
               .then(function(cache) {
                 cache.put(event.request, responseToCache);
               });
-
             return response;
-          }
-        ).catch(() => {
-            // Optional: return halaman fallback offline di sini jika diperlukan
-            // if (event.request.mode === 'navigate') {
-            //     return caches.match('/offline.html');
-            // }
         });
       })
   );
