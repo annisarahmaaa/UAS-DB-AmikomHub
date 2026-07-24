@@ -205,8 +205,8 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Midtrans API Error: ' . $e->getMessage());
-            // Jika terjadi error dari API Midtrans (transaksi tidak valid), kembalikan ke beranda
-            return redirect()->route('home')->with('error', 'Transaksi tidak ditemukan atau gagal diproses oleh sistem pembayaran: ' . $e->getMessage());
+            // Abaikan error dari API Midtrans (biarkan Webhook yang memproses pembaruan status)
+            // Tetap tampilkan halaman sukses agar pengguna tidak kebingungan
         }
 
         return view('checkout.success', compact('transaction', 'categories'));
