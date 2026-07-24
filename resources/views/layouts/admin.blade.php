@@ -16,11 +16,14 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 flex min-h-screen">
+<body class="bg-slate-50 text-slate-900 flex min-h-screen overflow-x-hidden">
 
-    <aside class="w-64 bg-indigo-900 text-indigo-100 flex flex-col p-6 sticky top-0 h-screen shadow-xl overflow-y-auto">
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+    <aside id="admin-sidebar" class="w-64 shrink-0 bg-indigo-900 text-indigo-100 flex flex-col p-6 fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto">
         <div class="flex items-center gap-3 mb-10">
-            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-900 font-bold text-xl shadow-lg">AH</div>
+            <img src="{{ asset('icons/rounded-logo-light.png') }}" alt="Amikom Event Hub" class="h-10">
             <span class="text-xl font-bold text-white tracking-tight text-nowrap">AmikomEventHub</span>
         </div>
 
@@ -111,11 +114,19 @@
         </div>
     </aside>
 
-    <main class="flex-1 p-10 w-full bg-slate-50 min-h-screen">
-        <header class="flex justify-between items-start mb-10">
-            <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">@yield('page_title', 'Dashboard')</h1>
-                <p class="text-slate-500 font-medium mt-1">@yield('page_subtitle', 'Selamat datang kembali!')</p>
+    <main class="flex-1 p-6 lg:p-10 w-full bg-slate-50 min-h-screen max-w-full">
+        <header class="flex justify-between items-start mb-10 gap-4">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="lg:hidden p-2 bg-white rounded-xl shadow-sm text-slate-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div>
+                @hasSection('page_title')
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">@yield('page_title')</h1>
+                    @hasSection('page_subtitle')
+                        <p class="text-slate-500 font-medium mt-1">@yield('page_subtitle')</p>
+                    @endif
+                @endif
             </div>
             
             <!-- KOTAK PROFIL ADMIN DINAMIS -->
@@ -153,5 +164,18 @@
         </div>
     </main>
 
+    <script>
+        const sidebar = document.getElementById('admin-sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        if(toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+        if(backdrop) backdrop.addEventListener('click', toggleSidebar);
+    </script>
 </body>
 </html>

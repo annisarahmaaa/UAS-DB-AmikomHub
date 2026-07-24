@@ -64,8 +64,8 @@ class CheckoutController extends Controller
             }
         }
 
-        $adminFee = 5000;
-        $totalPrice = $basePrice - $discountAmount + $adminFee;
+        $adminFee = ($basePrice - $discountAmount > 0) ? 5000 : 0;
+        $totalPrice = max(0, $basePrice - $discountAmount + $adminFee);
         // --- END DYNAMIC PRICING ---
 
         // 4. Merekam Transaksi ke Database
@@ -85,7 +85,28 @@ class CheckoutController extends Controller
         // 5. Dispatch Job untuk Mengirim Link Pembayaran via WhatsApp (Instan)
         \App\Jobs\CheckAbandonedCart::dispatch($transaction);
 
-        // --- INTEGRASI SNAP MIDTRANS ---
+        // --- BYPASS UNTUK EVENT GRATIS (Rp 0) ---
+        if ($totalPrice <= 0) {
+            // Update rekaman kita bahwa transaksi sukses tanpa bayar
+            $transaction->update(['status' => 'success']);
+
+            // Kirim Email secara manual
+            try {
+                \Illuminate\Support\Facades\Mail::to($transaction->customer_email)
+                    ->send(new \App\Mail\EventTicketMail($transaction));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Gagal mengirim email E-Ticket (Free Event): ' . $e->getMessage());
+            }
+
+            // Kirim E-Ticket via WhatsApp
+            \App\Services\WhatsAppService::sendTicket($transaction);
+
+            // Redirect langsung ke halaman sukses
+            return redirect()->route('checkout.success', $transaction->order_id)
+                             ->with('success', 'Tiket gratis berhasil didapatkan!');
+        }
+
+        // --- INTEGRASI SNAP MIDTRANS (Berbayar) ---
         
         // Konfigurasi Kredensial Environment Midtrans
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');

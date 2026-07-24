@@ -47,8 +47,8 @@
         <div class="futuristic-card rounded-[2.4rem] p-8 md:p-10">
             
             <div class="text-center mb-8">
-                <div class="w-14 h-14 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center text-white font-extrabold text-xl mx-auto mb-4 shadow-lg shadow-indigo-600/30 transition-all duration-300 hover:rotate-12">
-                    AH
+                <div class="mx-auto mb-4 flex justify-center">
+                    <img src="{{ asset('icons/rounded-logo-dark.png') }}" alt="Amikom Event Hub" class="h-14">
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-950">
                     Welcome Back

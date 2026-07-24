@@ -43,17 +43,17 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse($coupons as $coupon)
                 <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <span class="font-bold text-lg text-slate-800 tracking-widest">{{ $coupon->code }}</span>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         @if($coupon->discount_type === 'percent')
                             <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full font-bold text-sm">{{ $coupon->discount_value }}% OFF</span>
                         @else
                             <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-bold text-sm">Rp {{ number_format($coupon->discount_value, 0, ',', '.') }}</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         @if($coupon->event_id)
                             <span class="text-indigo-600 font-bold text-sm">{{ $coupon->event->title }}</span>
                         @else

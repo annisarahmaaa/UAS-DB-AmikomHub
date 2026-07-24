@@ -37,10 +37,10 @@
             <tbody class="divide-y border-t">
                 @forelse($users as $user)
                     <tr class="hover:bg-slate-50 transition duration-150">
-                        <td class="px-8 py-6 font-bold text-slate-800">
+                        <td class="px-8 py-6 font-bold text-slate-800 whitespace-nowrap">
                             {{ $user->name }}
                         </td>
-                        <td class="px-8 py-6 text-sm text-slate-600">
+                        <td class="px-8 py-6 text-sm text-slate-600 whitespace-nowrap">
                             {{ $user->email }}
                         </td>
                         <td class="px-8 py-6">

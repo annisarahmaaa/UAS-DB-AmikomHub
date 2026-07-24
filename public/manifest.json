@@ -1,0 +1,18 @@
+{
+    "name": "Amikom Event Hub",
+    "short_name": "AmikomEvent",
+    "description": "Platform Manajemen dan Tiket Acara Mahasiswa Amikom",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4f46e5",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icons/square-logo-dark.png",
+            "sizes": "192x192 512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

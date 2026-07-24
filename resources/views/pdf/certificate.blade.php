@@ -123,7 +123,7 @@
         /* Tanda Tangan */
         .signatures-table {
             position: absolute;
-            bottom: 30px; /* Kunci tabel 30px dari batas bawah .border-inner */
+            bottom: 80px; /* Diubah dari 30px menjadi 80px agar stempel (tinggi 100px) tidak menabrak garis bawah */
             left: 0;
             width: 100%;
             border-collapse: collapse;
@@ -176,7 +176,10 @@
 <body>
     <div class="border-outer"></div>
     <div class="border-inner">
-        <div class="logo-text">AmikomEventHub</div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ public_path('icons/rounded-logo-dark.png') }}" alt="Logo" style="height: 50px; margin-bottom: 10px;">
+            <div class="logo-text">AmikomEventHub</div>
+        </div>
         
         <div class="title">Certificate</div>
         <div class="subtitle">of Attendance</div>
