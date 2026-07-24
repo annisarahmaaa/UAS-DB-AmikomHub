@@ -54,9 +54,9 @@
                 <!-- Section Kupon -->
                 <div class="py-4 my-2 border-y border-dashed">
                     <label class="block text-sm font-bold text-slate-700 mb-2">Punya Kode Promo/Voucher?</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="couponInput" placeholder="Masukkan kode kupon..." class="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium uppercase">
-                        <button type="button" id="applyCouponBtn" class="px-6 py-2 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition">Terapkan</button>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="couponInput" placeholder="Kode promo..." class="flex-1 min-w-0 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium uppercase text-sm">
+                        <button type="button" id="applyCouponBtn" class="shrink-0 px-5 py-2.5 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 transition">Terapkan</button>
                     </div>
                     <p id="couponMessage" class="text-sm font-semibold mt-2 hidden"></p>
                 </div>

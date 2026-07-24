@@ -30,62 +30,64 @@
 <body class="bg-slate-50 text-slate-900">
 
     <!-- Navigation -->
-    <nav class="glass sticky top-8 z-40 mx-4 mt-4 px-6 py-4 rounded-2xl border border-white/20 shadow-lg flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <img src="{{ asset('icons/rounded-logo-dark.png') }}" alt="Amikom Event Hub" class="h-10">
-            <span class="text-xl font-bold tracking-tight">AmikomEventHub</span>
+    <nav class="glass sticky top-4 z-50 mx-4 mt-4 px-6 py-4 rounded-2xl border border-white/20 shadow-lg">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('icons/rounded-logo-dark.png') }}" alt="Amikom Event Hub" class="h-10">
+                <span class="text-xl font-bold tracking-tight">AmikomEventHub</span>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex gap-8 font-medium items-center">
+                <a href="/" class="{{ request()->is('/') ? 'text-indigo-600 font-bold' : 'hover:text-indigo-600 transition' }}">Jelajahi</a>
+                <a href="/#events" class="hover:text-indigo-600 transition">Kategori</a>
+                <a href="#" class="hover:text-indigo-600 transition">Tentang Kami</a>
+
+                <!-- Tombol Login / User Profile -->
+                @auth
+                    <div class="flex items-center gap-4 ml-4">
+                        <span class="text-sm font-bold text-slate-700">Halo, {{ Auth::user()->name }}</span>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-5 py-2 text-sm font-bold text-white bg-rose-600 rounded-full hover:bg-rose-700 transition">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" class="ml-4 px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20">
+                        Login
+                    </a>
+                @endauth
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-slate-700 p-2 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
         </div>
 
-        <!-- Desktop Menu -->
-        <div class="hidden md:flex gap-8 font-medium items-center">
-            <a href="/" class="{{ request()->is('/') ? 'text-indigo-600' : 'hover:text-indigo-600 transition' }}">Jelajahi</a>
-            <a href="/#events" class="hover:text-indigo-600 transition">Kategori</a>
-            <a href="#" class="hover:text-indigo-600 transition">Tentang Kami</a>
-
-            <!-- Tombol Login / User Profile -->
+        <!-- Mobile Menu Dropdown (Clean & Attached) -->
+        <div id="mobile-menu" class="hidden md:hidden pt-4 mt-4 border-t border-slate-200/60 flex-col gap-3">
+            <a href="/" class="text-base font-bold {{ request()->is('/') ? 'text-indigo-600' : 'text-slate-700 hover:text-indigo-600' }}">Jelajahi</a>
+            <a href="/#events" class="text-base font-bold text-slate-700 hover:text-indigo-600">Kategori</a>
+            <a href="#" class="text-base font-bold text-slate-700 hover:text-indigo-600">Tentang Kami</a>
+            <hr class="border-slate-100 my-1">
             @auth
-                <div class="flex items-center gap-4 ml-4">
-                    <span class="text-sm font-bold text-slate-700">Halo, {{ Auth::user()->name }}</span>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="px-5 py-2 text-sm font-bold text-white bg-rose-600 rounded-full hover:bg-rose-700 transition">
-                            Logout
-                        </button>
-                    </form>
-                </div>
+                <span class="text-sm font-bold text-slate-700 block">Halo, {{ Auth::user()->name }}</span>
+                <form action="{{ route('logout') }}" method="POST" class="block w-full">
+                    @csrf
+                    <button type="submit" class="w-full px-5 py-2.5 text-center text-sm font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition">
+                        Logout
+                    </button>
+                </form>
             @else
-                <a href="{{ route('login') }}" class="ml-4 px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20">
+                <a href="{{ route('login') }}" class="block w-full text-center px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20">
                     Login
                 </a>
             @endauth
         </div>
-
-        <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="md:hidden text-slate-700 p-2 focus:outline-none">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-        </button>
     </nav>
-
-    <!-- Mobile Menu Dropdown -->
-    <div id="mobile-menu" class="hidden md:hidden fixed top-24 left-4 right-4 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-6 z-40 flex-col gap-4">
-        <a href="/" class="text-lg font-bold {{ request()->is('/') ? 'text-indigo-600' : 'text-slate-700 hover:text-indigo-600' }}">Jelajahi</a>
-        <a href="/#events" class="text-lg font-bold text-slate-700 hover:text-indigo-600">Kategori</a>
-        <a href="#" class="text-lg font-bold text-slate-700 hover:text-indigo-600">Tentang Kami</a>
-        <hr class="border-slate-200">
-        @auth
-            <span class="text-sm font-bold text-slate-700 block mb-2">Halo, {{ Auth::user()->name }}</span>
-            <form action="{{ route('logout') }}" method="POST" class="block w-full">
-                @csrf
-                <button type="submit" class="w-full px-5 py-3 text-center text-sm font-bold text-white bg-rose-600 rounded-full hover:bg-rose-700 transition">
-                    Logout
-                </button>
-            </form>
-        @else
-            <a href="{{ route('login') }}" class="block w-full text-center px-6 py-3 text-sm font-bold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20 mt-2">
-                Login
-            </a>
-        @endauth
-    </div>
 
     {{-- Tempat konten dari welcome.blade.php akan muncul --}}
     @yield('content')
