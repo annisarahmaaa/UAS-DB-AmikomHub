@@ -57,7 +57,7 @@ class EventController extends Controller
             'poster'      => 'nullable|image|max:2048'
         ]);
 
-        $disk = config('filesystems.default', 'public');
+        $disk = (isset($_SERVER['VERCEL']) || getenv('VERCEL')) ? 's3' : config('filesystems.default', 'public');
 
         if ($request->hasFile('poster')) {
             $data['poster_path'] = $request->file('poster')->store('posters', $disk);
@@ -101,7 +101,7 @@ class EventController extends Controller
             'poster'      => 'nullable|image|max:2048'
         ]); 
 
-        $disk = config('filesystems.default', 'public');
+        $disk = (isset($_SERVER['VERCEL']) || getenv('VERCEL')) ? 's3' : config('filesystems.default', 'public');
 
         if ($request->hasFile('poster')) {
             if ($event->poster_path) {
@@ -122,7 +122,7 @@ class EventController extends Controller
     {
         $this->authorizeAccess($event); // Satpam penjaga tenant
 
-        $disk = config('filesystems.default', 'public');
+        $disk = (isset($_SERVER['VERCEL']) || getenv('VERCEL')) ? 's3' : config('filesystems.default', 'public');
 
         if ($event->poster_path) {
             Storage::disk($disk)->delete($event->poster_path);

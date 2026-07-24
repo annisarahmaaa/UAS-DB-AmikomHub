@@ -53,7 +53,13 @@ class ECertificateMail extends Mailable
      */
     public function attachments(): array
     {
-        $pdf = Pdf::loadView('pdf.certificate', ['transaction' => $this->transaction])
+        $pdf = Pdf::setOptions([
+                'fontDir' => '/tmp',
+                'fontCache' => '/tmp',
+                'tempDir' => '/tmp',
+                'chroot' => '/tmp'
+            ])
+            ->loadView('pdf.certificate', ['transaction' => $this->transaction])
             ->setPaper('a4', 'landscape');
 
         return [

@@ -10,6 +10,7 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <meta name="theme-color" content="#4f46e5">
     <link rel="apple-touch-icon" href="{{ asset('icons/square-logo-dark.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('icons/rounded-logo-dark.png') }}">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
