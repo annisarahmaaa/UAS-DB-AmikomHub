@@ -1,6 +1,7 @@
 {
     "version": 2,
     "framework": null,
+    "outputDirectory": "public",
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false",
@@ -21,8 +22,8 @@
     },
     "routes": [
         {
-            "src": "/(css|js|images|fonts|build)/(.*)",
-            "dest": "/public/$1/$2"
+            "src": "/(css|js|images|fonts|icons|build|manifest.json|sw.js|favicon.ico)(.*)",
+            "dest": "/public/$1$2"
         },
         {
             "src": "/(.*)",
