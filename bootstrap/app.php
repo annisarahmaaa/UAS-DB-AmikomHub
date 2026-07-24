@@ -4,7 +4,31 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+$storagePath = (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || (is_dir('/tmp') && !@is_writable(__DIR__.'/../storage/framework/views')))
+    ? '/tmp/storage'
+    : null;
+
+if ($storagePath) {
+    foreach ([
+        '/tmp/storage/app/public',
+        '/tmp/storage/framework/cache/data',
+        '/tmp/storage/framework/sessions',
+        '/tmp/storage/framework/views',
+        '/tmp/storage/logs',
+    ] as $folder) {
+        if (!is_dir($folder)) {
+            @mkdir($folder, 0777, true);
+        }
+    }
+}
+
+$builder = Application::configure(basePath: dirname(__DIR__));
+
+if ($storagePath) {
+    $builder->useStoragePath($storagePath);
+}
+
+return $builder
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
