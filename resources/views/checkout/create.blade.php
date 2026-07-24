@@ -7,7 +7,7 @@
     $activePriceData = $event->getActivePrice();
     $activePrice = $activePriceData['price'];
     $tierName = $activePriceData['tier_name'];
-    $adminFee = 5000;
+    $adminFee = ($activePrice > 0) ? 5000 : 0;
 @endphp
 <main class="max-w-3xl mx-auto px-6 py-20">
     <div class="mb-12">
