@@ -45,7 +45,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
 if ($storagePath) {
     $app->useStoragePath($storagePath);
-    $app->make('config')->set('view.compiled', '/tmp/storage/framework/views');
 }
 
 return $app;
