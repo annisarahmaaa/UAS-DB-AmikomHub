@@ -35,7 +35,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex md:items-center justify-center p-4 py-10 relative overflow-x-hidden overflow-y-auto">
     
     <canvas id="neuralCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
