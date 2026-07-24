@@ -77,7 +77,6 @@ class WhatsAppService
             $payload = [
                 'target' => $target,
                 'message' => $message,
-                'countryCode' => '62', // Indonesia
             ];
 
             // Tambahkan URL gambar jika disediakan
@@ -104,16 +103,18 @@ class WhatsAppService
     }
 
     /**
-     * Format nomor telepon ke format yang diterima WhatsApp
+     * Format nomor telepon ke format internasional 62xxx yang diterima WhatsApp
      */
     private static function formatPhoneNumber($phone)
     {
         // Hilangkan karakter selain angka
         $phone = preg_replace('/[^0-9]/', '', $phone);
         
-        // Ubah awalan 0 menjadi 62
+        // Ubah awalan 0 menjadi 62, atau tambahkan 62 jika diawali angka 8
         if (substr($phone, 0, 1) === '0') {
             $phone = '62' . substr($phone, 1);
+        } elseif (substr($phone, 0, 2) !== '62') {
+            $phone = '62' . $phone;
         }
         
         return $phone;

@@ -99,9 +99,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @forelse($events as $event)
             <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                <div class="relative overflow-hidden aspect-[3/4]">
+                <div class="relative overflow-hidden">
                     {{-- Menggunakan pengondisian dinamis sesuai instruksi soal 9.4.5 --}}
-                    <img src="{{ $event->poster_url }}" alt="{{ $event->title }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <img src="{{ $event->poster_url }}" alt="{{ $event->title }}" class="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-300">
                     
                     <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold uppercase text-indigo-600">
                         {{-- Memanggil relasi nama kategori secara bersambung --}}
