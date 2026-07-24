@@ -17,6 +17,9 @@ try {
     }
 
     $_SERVER['SCRIPT_NAME'] = '/index.php';
+    $_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
+    $_SERVER['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
+    putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 
     if (!defined('LARAVEL_START')) {
         define('LARAVEL_START', microtime(true));
@@ -35,13 +38,7 @@ try {
     // 3. Alihkan Storage Path ke /tmp/storage
     $app->useStoragePath('/tmp/storage');
 
-    // 4. Paksa config Laravel menggunakan folder /tmp/storage yang writable
-    $config = $app->make('config');
-    $config->set('view.compiled', '/tmp/storage/framework/views');
-    $config->set('session.files', '/tmp/storage/framework/sessions');
-    $config->set('cache.stores.file.path', '/tmp/storage/framework/cache/data');
-
-    // 5. Handle Request (Laravel 11/13 Standard)
+    // 4. Handle Request (Laravel 11/13 Standard)
     $app->handleRequest(\Illuminate\Http\Request::capture());
 } catch (\Throwable $e) {
     http_response_code(500);
