@@ -125,6 +125,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // Semua rute sensitif di bawah ini resmi TERGEMBOK dari Organizer biasa:
             Route::resource('categories', CategoryController::class);
             Route::resource('partners', PartnerController::class);
+            Route::resource('teams', \App\Http\Controllers\Admin\TeamController::class);
             Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
             
             // Rute Kelola Pengguna Platform

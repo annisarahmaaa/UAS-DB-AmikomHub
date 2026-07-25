@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Category;
 use App\Models\Partner; // 1. Wajib tambahkan ini untuk memanggil model Partner
+use App\Models\Team;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -35,7 +36,10 @@ class HomeController extends Controller
         // Eksekusi query
         $events = $query->get();
 
-        // 3. Tambahkan 'partners' ke dalam compact agar terkirim ke view
-        return view('welcome', compact('events', 'categories', 'partners'));
+        // Ambil semua data tim
+        $teams = Team::all();
+
+        // 3. Tambahkan 'partners' dan 'teams' ke dalam compact agar terkirim ke view
+        return view('welcome', compact('events', 'categories', 'partners', 'teams'));
     }
 }

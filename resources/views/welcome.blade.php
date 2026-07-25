@@ -186,44 +186,23 @@
             </div>
 
             <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-                {{-- Team Member 1 --}}
+                @forelse($teams as $team)
                 <div class="flex flex-col items-center justify-center gap-4 group">
-                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white">
-                        <img src="https://ui-avatars.com/api/?name=Team+Member+1&background=random" 
-                            alt="Team Member 1" 
+                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white shadow-sm">
+                        <img src="{{ $team->photo_url }}" 
+                            alt="{{ $team->name }}" 
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                     </div>
                     <div class="text-center">
-                        <h3 class="text-lg font-bold text-slate-800">Team Member 1</h3>
-                        <p class="text-sm text-indigo-600 font-medium">CEO & Founder</p>
+                        <h3 class="text-lg font-bold text-slate-800">{{ $team->name }}</h3>
+                        <p class="text-sm text-indigo-600 font-medium">{{ $team->role }}</p>
                     </div>
                 </div>
-
-                {{-- Team Member 2 --}}
-                <div class="flex flex-col items-center justify-center gap-4 group">
-                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white">
-                        <img src="https://ui-avatars.com/api/?name=Team+Member+2&background=random" 
-                            alt="Team Member 2" 
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                    </div>
-                    <div class="text-center">
-                        <h3 class="text-lg font-bold text-slate-800">Team Member 2</h3>
-                        <p class="text-sm text-indigo-600 font-medium">Lead Developer</p>
-                    </div>
+                @empty
+                <div class="text-center py-4">
+                    <p class="text-slate-400 text-sm italic">Belum ada anggota tim yang ditambahkan.</p>
                 </div>
-
-                {{-- Team Member 3 --}}
-                <div class="flex flex-col items-center justify-center gap-4 group">
-                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white">
-                        <img src="https://ui-avatars.com/api/?name=Team+Member+3&background=random" 
-                            alt="Team Member 3" 
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                    </div>
-                    <div class="text-center">
-                        <h3 class="text-lg font-bold text-slate-800">Team Member 3</h3>
-                        <p class="text-sm text-indigo-600 font-medium">Marketing Director</p>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>

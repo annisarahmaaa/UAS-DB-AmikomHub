@@ -19,12 +19,12 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 flex min-h-screen overflow-x-hidden">
+<body class="bg-slate-50 text-slate-900 flex h-screen overflow-hidden">
 
     <!-- Mobile Sidebar Backdrop -->
     <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden"></div>
 
-    <aside id="admin-sidebar" class="w-64 shrink-0 bg-indigo-900 text-indigo-100 flex flex-col p-6 fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto">
+    <aside id="admin-sidebar" class="w-64 shrink-0 bg-indigo-900 text-indigo-100 flex flex-col p-6 fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto h-screen">
         <div class="flex items-center gap-3 mb-10">
             <img src="{{ asset('icons/rounded-logo-light.png') }}" alt="Amikom Event Hub" class="h-10">
             <span class="text-xl font-bold text-white tracking-tight text-nowrap">AmikomEventHub</span>
@@ -86,6 +86,14 @@
                     Kelola Partner
                 </a>
 
+                <a href="{{ route('admin.teams.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.teams*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Kelola Tim
+                </a>
+
                 <a href="{{ route('admin.transactions.index') }}" 
                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 {{ request()->routeIs('admin.transactions*') ? 'bg-indigo-800 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-800 hover:text-white' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +125,7 @@
         </div>
     </aside>
 
-    <main class="flex-1 p-6 lg:p-10 w-full bg-slate-50 min-h-screen max-w-full">
+    <main class="flex-1 p-6 lg:p-10 w-full bg-slate-50 min-w-0 h-screen overflow-y-auto">
         <header class="flex justify-between items-start mb-10 gap-4">
             <div class="flex items-center gap-4">
                 <button id="sidebar-toggle" class="lg:hidden p-2 bg-white rounded-xl shadow-sm text-slate-600 focus:outline-none">
