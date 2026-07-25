@@ -48,6 +48,7 @@ Route::post('/upgrade-organizer', [UserController::class, 'upgradeToOrganizer'])
 Route::get('/tentang', function () { return '<h1>Halaman Tentang</h1>'; })->name('about');
 Route::get('/kontak',  function () { return view('contact'); })->name('contact');
 Route::get('/bantuan', function () { return view('bantuan'); })->name('help');
+Route::get('/cara-bayar', function () { return view('cara-bayar'); })->name('payment.info');
 
 // User Features
 Route::get('/profil',  function () { return view('profil'); })->name('profile');

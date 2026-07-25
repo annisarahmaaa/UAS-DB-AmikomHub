@@ -132,7 +132,7 @@
                 <ul class="space-y-4">
                     <li><a href="/" class="hover:text-white transition">Home</a></li>
                     <li><a href="/#events" class="hover:text-white transition">Semua Event</a></li>
-                    <li><a href="#" class="hover:text-white transition">Cara Bayar</a></li>
+                    <li><a href="/cara-bayar" class="hover:text-white transition">Cara Bayar</a></li>
                 </ul>
             </div>
 
@@ -147,7 +147,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto pt-12 mt-12 border-t border-indigo-800 text-center text-indigo-400 text-sm">
-            &copy; 2026 AmikomEventHub. Built with Laravel & Tailwind CSS.
+            &copy; {{ date('Y') }} AmikomEventHub. All rights reserved.
         </div>
     </footer>
     @stack('scripts')

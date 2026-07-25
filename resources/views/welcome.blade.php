@@ -156,12 +156,15 @@
             {{-- Proses Perulangan @forelse untuk Merender Daftar Partner --}}
             <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
                 @forelse($partners as $partner)
-                    <div class="w-36 h-20 flex items-center justify-center p-3 bg-slate-50/50 rounded-2xl border border-slate-100 hover:shadow-md hover:border-indigo-100 transition-all duration-300 group">
-                        {{-- Menampilkan Gambar Logo dari URL Database --}}
-                        <img src="{{ $partner->logo_url }}" 
-                            alt="Logo {{ $partner->name }}" 
-                            title="{{ $partner->name }}" 
-                            class="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300">
+                    <div class="flex flex-col items-center justify-center gap-2 p-3 bg-slate-50/50 rounded-2xl border border-slate-100 hover:shadow-md hover:border-indigo-100 transition-all duration-300 group">
+                        <div class="w-36 h-20 flex items-center justify-center">
+                            {{-- Menampilkan Gambar Logo dari URL Database --}}
+                            <img src="{{ $partner->logo_url }}" 
+                                alt="Logo {{ $partner->name }}" 
+                                title="{{ $partner->name }}" 
+                                class="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300">
+                        </div>
+                        <span class="text-sm font-bold text-slate-700 text-center">{{ $partner->name }}</span>
                     </div>
                 @empty
                     {{-- Tampilan jika data partner di database masih kosong --}}
@@ -169,6 +172,58 @@
                         <p class="text-slate-400 text-sm italic">Belum ada partner yang terdaftar saat ini.</p>
                     </div>
                 @endforelse
+            </div>
+        </div>
+    </section>
+    {{-- =============================================================== --}}
+
+    {{-- ================= BAGIAN OUR TEAMS ================= --}}
+    <section class="py-16 bg-slate-50 border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Our Teams</h2>
+                <p class="text-slate-500 text-sm font-medium mt-1">Orang-orang hebat di balik AmikomEventHub</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+                {{-- Team Member 1 --}}
+                <div class="flex flex-col items-center justify-center gap-4 group">
+                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white">
+                        <img src="https://ui-avatars.com/api/?name=Team+Member+1&background=random" 
+                            alt="Team Member 1" 
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold text-slate-800">Team Member 1</h3>
+                        <p class="text-sm text-indigo-600 font-medium">CEO & Founder</p>
+                    </div>
+                </div>
+
+                {{-- Team Member 2 --}}
+                <div class="flex flex-col items-center justify-center gap-4 group">
+                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white">
+                        <img src="https://ui-avatars.com/api/?name=Team+Member+2&background=random" 
+                            alt="Team Member 2" 
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold text-slate-800">Team Member 2</h3>
+                        <p class="text-sm text-indigo-600 font-medium">Lead Developer</p>
+                    </div>
+                </div>
+
+                {{-- Team Member 3 --}}
+                <div class="flex flex-col items-center justify-center gap-4 group">
+                    <div class="w-32 h-32 overflow-hidden rounded-full border-4 border-indigo-100 group-hover:border-indigo-300 transition-all duration-300 bg-white">
+                        <img src="https://ui-avatars.com/api/?name=Team+Member+3&background=random" 
+                            alt="Team Member 3" 
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold text-slate-800">Team Member 3</h3>
+                        <p class="text-sm text-indigo-600 font-medium">Marketing Director</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
